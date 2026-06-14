@@ -60,34 +60,31 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
 
-                // PUBLIC — login and registration require no token
+                // ── PUBLIC STATIC PAGES ────────────────────────────────────
+                .requestMatchers("/", "/index.html", "/admin.html").permitAll()
+                .requestMatchers("/static/**", "/css/**", "/js/**", "/*.ico").permitAll()
+
+                // ── PUBLIC API ─────────────────────────────────────────────
                 .requestMatchers("/api/auth/**").permitAll()
 
-                // ADMIN only — full audit trail access
-                .requestMatchers("/api/audit-logs/**").hasRole("ADMIN")
-
-                // ADMIN + STAFF — client management
-                .requestMatchers("/api/clients/**").hasAnyRole("ADMIN", "STAFF")
-
-                // ADMIN only — top-level structure management
-                .requestMatchers("/api/structures/**").hasRole("ADMIN")
-
-                // ADMIN + STAFF — service and availability management
+                // ── CLIENT-accessible GETs (must be before ADMIN-only rules)
                 .requestMatchers(HttpMethod.GET, "/api/services/**").authenticated()
-                .requestMatchers("/api/services/**").hasAnyRole("ADMIN", "STAFF")
-                .requestMatchers("/api/service-availabilities/**").hasAnyRole("ADMIN", "STAFF")
-
-                // ADMIN + STAFF — slot management
                 .requestMatchers(HttpMethod.GET, "/api/slots/**").authenticated()
-                .requestMatchers("/api/slots/**").hasAnyRole("ADMIN", "STAFF")
 
+                // ── ADMIN only ─────────────────────────────────────────────
+                .requestMatchers("/api/audit-logs/**").hasRole("ADMIN")
+                .requestMatchers("/api/clients/**").hasRole("ADMIN")
+                .requestMatchers("/api/structures/**").hasRole("ADMIN")
+                .requestMatchers("/api/services/**").hasRole("ADMIN")
+                .requestMatchers("/api/service-availabilities/**").hasRole("ADMIN")
+                .requestMatchers("/api/slots/**").hasRole("ADMIN")
 
-                // Any authenticated user (any role) — reservations and reminders
+                // ── ANY AUTHENTICATED (CLIENT + ADMIN) ─────────────────────
                 .requestMatchers("/api/reservations/**").authenticated()
                 .requestMatchers("/api/reminders/**").authenticated()
 
-                // Catch-all — any endpoint not listed above requires authentication
-                .anyRequest().authenticated()
+                // ── CATCH-ALL ──────────────────────────────────────────────
+                .anyRequest().authenticated()   
             )
 
             // Register JwtAuthenticationFilter to run BEFORE Spring's own

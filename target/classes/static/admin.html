@@ -131,7 +131,6 @@
     .badge-confirmed { background: #eaf3de; color: #27500a; }
     .badge-cancelled { background: #fcebeb; color: #791f1f; }
     .badge-admin  { background: var(--color-background-danger); color: var(--color-text-danger); }
-    .badge-staff  { background: var(--color-background-info);  color: var(--color-text-info); }
     .badge-client { background: var(--color-background-secondary); color: var(--color-text-secondary); }
 
     /* ── MODAL ── */
@@ -831,7 +830,7 @@ function buildForm(type, d) {
       ${!d ? `<label>Password * (min 8 chars)</label><input type="password" id="f-password">` : ''}
       <label>Role *</label>
       <select id="f-role">
-        ${['CLIENT','STAFF','ADMIN'].map(r => {
+        ${['CLIENT','ADMIN'].map(r => {
           const currentRoles = Array.isArray(d?.roles) ? d.roles.map(x => typeof x === 'string' ? x : String(x)) : [];
           return `<option value="${r}" ${currentRoles.includes(r)?'selected':''}>${r}</option>`;
         }).join('')}
