@@ -9,4 +9,7 @@ public interface AuditLogService {
     AuditLogResponse getById(UUID id);
     List<AuditLogResponse> getAll();
     List<AuditLogResponse> getByEntity(String entityName, UUID entityId);
+
+    //202606 update log details
+    void log(String entityName, UUID entityId, String action, String performedBy, String details);
 }

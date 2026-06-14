@@ -12,6 +12,7 @@ import com.grey.rdv_manager_api.payload.request.UpdateReservationRequest;
 import com.grey.rdv_manager_api.payload.response.ReservationResponse;
 import com.grey.rdv_manager_api.repository.ReservationRepository;
 import com.grey.rdv_manager_api.repository.SlotRepository;
+import com.grey.rdv_manager_api.service.AuditLogService;
 import com.grey.rdv_manager_api.service.ReservationService;
 import com.grey.rdv_manager_api.domain.enums.ReservationStatus;
 
@@ -26,6 +27,9 @@ public class ReservationServiceImpl implements ReservationService {
     private final ReservationRepository repository;
     private final ReservationMapper mapper;
     private final SlotRepository slotRepository;
+
+    //202606 update log
+    private final AuditLogService auditLogService;
 
     @Override
     @Transactional
@@ -56,6 +60,15 @@ public class ReservationServiceImpl implements ReservationService {
         entity.setUpdatedAt(LocalDateTime.now());  // ← add this as fallback
 
         Reservation saved = repository.save(entity);
+
+        //202606 update log 
+        auditLogService.log(
+            "Reservation", saved.getId(),
+            "CREATE",
+            String.valueOf(request.clientId()),
+            "Client " + request.clientId() + " booked slot " + request.slotId()
+        );  
+
         return mapper.toResponse(saved);
     }
 
@@ -113,6 +126,15 @@ public class ReservationServiceImpl implements ReservationService {
 
         // PENDING → CANCELLED: no slot change needed
         Reservation updated = repository.save(entity);
+
+        //202606 update log
+        auditLogService.log(
+            "Reservation", updated.getId(),
+            "UPDATE",
+            "ADMIN",
+            "Status changed from " + oldStatus + " to " + newStatus
+        );
+
         return mapper.toResponse(updated);
         //end new part
     }
@@ -132,6 +154,14 @@ public class ReservationServiceImpl implements ReservationService {
                 slotRepository.save(slot);
             }
         }
+
+        //202606 update log
+        auditLogService.log(
+            "Reservation", entity.getId(),
+            "DELETE",
+            "ADMIN",
+            "Reservation deleted — was " + entity.getStatus()
+        );
 
         repository.deleteById(id);
     }

@@ -9,6 +9,7 @@ import com.grey.rdv_manager_api.payload.response.AuditLogResponse;
 import com.grey.rdv_manager_api.repository.AuditLogRepository;
 import com.grey.rdv_manager_api.service.AuditLogService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,5 +36,21 @@ public class AuditLogServiceImpl implements AuditLogService {
     public List<AuditLogResponse> getByEntity(String entityName, UUID entityId) {
         List<AuditLog> logs = repository.findByEntityNameAndEntityId(entityName, entityId);
         return mapper.toResponseList(logs);
+    }
+
+    //202606 update log function
+    @Override
+    public void log(String entityName, UUID entityId, String action,
+                    String performedBy, String details) {
+        AuditLog entry = AuditLog.builder()
+            .id(UUID.randomUUID())
+            .entityName(entityName)
+            .entityId(entityId)
+            .action(action)
+            .performedBy(performedBy)
+            .timestamp(LocalDateTime.now())
+            .details(details)
+            .build();
+        repository.save(entry);
     }
 }

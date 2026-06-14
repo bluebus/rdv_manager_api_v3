@@ -13,6 +13,7 @@ import com.grey.rdv_manager_api.payload.request.CreateClientRequest;
 import com.grey.rdv_manager_api.payload.request.UpdateClientRequest;
 import com.grey.rdv_manager_api.payload.response.ClientResponse;
 import com.grey.rdv_manager_api.repository.ClientRepository;
+import com.grey.rdv_manager_api.service.AuditLogService;
 import com.grey.rdv_manager_api.service.ClientService;
 
 import java.util.List;
@@ -26,8 +27,10 @@ public class ClientServiceImpl implements ClientService {
     private final ClientRepository repository;
     private final ClientMapper mapper;
 
-    //add this part for password encoder
+    //202606 add this part for password encoder
     private final PasswordEncoder passwordEncoder;
+    //202606 add log service
+    private final AuditLogService auditLogService;
     //end new part
 
     @Override
@@ -41,6 +44,15 @@ public class ClientServiceImpl implements ClientService {
         //end new part
 
         Client saved = repository.save(entity);
+
+        //202606 update log
+        auditLogService.log(
+       "Client", saved.getId(),
+            "CREATE",
+            saved.getEmail(),
+            "New client registered with roles " + saved.getRoles()
+        );
+        //end new part
         return mapper.toResponse(saved);
     }
 

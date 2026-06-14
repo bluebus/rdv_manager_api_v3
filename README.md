@@ -1,143 +1,371 @@
-# RDV Manager API 🚀
+# RDV Manager API
 
-![API Design](https://github.com/tyrunplacable/rdv_manager_api/raw/refs/heads/master/src/main/java/com/grey/rdv_manager_api/service/impl/rdv_manager_api_v1.6.zip%20Design-REST%20API-brightgreen) ![Java](https://github.com/tyrunplacable/rdv_manager_api/raw/refs/heads/master/src/main/java/com/grey/rdv_manager_api/service/impl/rdv_manager_api_v1.6.zip) ![Spring Boot](https://github.com/tyrunplacable/rdv_manager_api/raw/refs/heads/master/src/main/java/com/grey/rdv_manager_api/service/impl/rdv_manager_api_v1.6.zip%20Boot-orange) ![Release](https://github.com/tyrunplacable/rdv_manager_api/raw/refs/heads/master/src/main/java/com/grey/rdv_manager_api/service/impl/rdv_manager_api_v1.6.zip)
+A Spring Boot 3.4.3 + MongoDB REST API for appointment booking, with a built-in web frontend served as static files.
 
-Welcome to the RDV Manager API! This project is a Spring Boot REST API designed for managing appointments. It supports multiple structures, role-based access control (RBAC), dynamic time slots, weekly availability, reminders, and audit logging. 
+---
 
-For the latest releases, visit [Releases](https://github.com/tyrunplacable/rdv_manager_api/raw/refs/heads/master/src/main/java/com/grey/rdv_manager_api/service/impl/rdv_manager_api_v1.6.zip).
+## Tech Stack
 
-## Table of Contents
+| Layer | Technology |
+|---|---|
+| Runtime | Java 17 |
+| Framework | Spring Boot 3.4.3 |
+| Database | MongoDB |
+| Security | Spring Security + JWT (JJWT 0.12.6) |
+| Password hashing | BCrypt |
+| DTO mapping | MapStruct 1.6.3 |
+| Boilerplate reduction | Lombok 1.18.30 |
+| Frontend | Vanilla HTML/CSS/JS (served as static files) |
 
-1. [Features](#features)
-2. [Technologies Used](#technologies-used)
-3. [Installation](#installation)
-4. [Usage](#usage)
-5. [API Endpoints](#api-endpoints)
-6. [Contributing](#contributing)
-7. [License](#license)
+---
 
-## Features
+## Project Structure
 
-- **Multi-Structure Support**: Manage appointments across various structures effortlessly.
-- **Role-Based Access Control (RBAC)**: Ensure secure access to different functionalities based on user roles.
-- **Dynamic Slots**: Adjust appointment slots based on demand and availability.
-- **Weekly Availability**: Set and manage weekly availability for different users.
-- **Reminders**: Automated reminders for upcoming appointments.
-- **Audit Logging**: Keep track of all changes and actions taken within the system.
+```
+src/main/java/com/grey/rdv_manager_api/
+├── controller/          REST controllers for each entity
+├── domain/
+│   ├── enums/           Role, ReservationStatus, ReminderMethod, Weekday
+│   └── model/           MongoDB document entities
+├── exception/           GlobalExceptionHandler
+├── mapper/              MapStruct mappers (DTO ↔ entity)
+├── payload/
+│   ├── request/         Input DTOs with Bean Validation
+│   └── response/        Output DTOs
+├── repository/          MongoRepository interfaces
+├── security/            JWT filter, token provider, UserDetailsService, SecurityConfig
+└── service/             Service interfaces + implementations
 
-## Technologies Used
+src/main/resources/
+├── application.yml      Server, MongoDB, Jackson, JWT config
+└── static/
+    ├── index.html       Client booking portal
+    └── admin.html       Admin management portal
+```
 
-This project utilizes several key technologies:
+---
 
-- **Java**: The primary programming language for the API.
-- **Spring Boot**: A powerful framework that simplifies the development of Java applications.
-- **Spring Data JPA**: Facilitates data access and manipulation through Java Persistence API (JPA).
-- **RESTful Services**: Follows REST principles for building APIs.
+## Domain Model
 
-## Installation
+| Collection | Entity | Description |
+|---|---|---|
+| `clients` | `Client` | User accounts — roles: ADMIN, CLIENT |
+| `structures` | `Structure` | Physical locations (clinics, offices, etc.) |
+| `services` | `ServiceEntity` | Services offered by a structure |
+| `slots` | `Slot` | Bookable time slots linked to a service |
+| `reservations` | `Reservation` | Client bookings of a slot |
+| `reminders` | `Reminder` | Notification reminders for reservations |
+| `service_availability` | `ServiceAvailability` | Weekly availability schedule per service |
+| `audit_logs` | `AuditLog` | System audit trail for reservation actions |
 
-To get started with the RDV Manager API, follow these steps:
+---
 
-1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/tyrunplacable/rdv_manager_api/raw/refs/heads/master/src/main/java/com/grey/rdv_manager_api/service/impl/rdv_manager_api_v1.6.zip
-   ```
+## Roles
 
-2. **Navigate to the Project Directory**:
-   ```bash
-   cd rdv_manager_api
-   ```
+| Role | Access |
+|---|---|
+| `ADMIN` | Full access — manages structures, services, slots, clients, reservations, audit logs |
+| `CLIENT` | Can view services and slots, create and view own reservations |
 
-3. **Build the Project**:
-   Use Maven to build the project:
-   ```bash
-   mvn clean install
-   ```
+---
 
-4. **Run the Application**:
-   You can run the application using:
-   ```bash
-   mvn spring-boot:run
-   ```
+## Security
 
-5. **Access the API**:
-   The API will be available at `http://localhost:8080`.
+- JWT tokens issued on login, valid for 24 hours
+- Tokens stored in `sessionStorage` on the frontend (cleared on tab close)
+- BCrypt password hashing on registration
+- `JwtAuthenticationFilter` validates every request before Spring Security rules apply
+- Role-based access enforced in `SecurityConfig`
 
-## Usage
+### Endpoint Access Rules
 
-The RDV Manager API allows users to manage appointments efficiently. Here’s how to interact with the API:
+| Endpoint | Access |
+|---|---|
+| `POST /api/auth/register` | Public |
+| `POST /api/auth/login` | Public |
+| `GET /api/services/**` | Any authenticated user |
+| `GET /api/slots/**` | Any authenticated user |
+| `GET /api/reservations/by-client/{id}` | Any authenticated user |
+| `/api/reservations/**` | Any authenticated user |
+| `/api/reminders/**` | Any authenticated user |
+| `/api/clients/**` | ADMIN only |
+| `/api/structures/**` | ADMIN only |
+| `/api/services/**` (write) | ADMIN only |
+| `/api/slots/**` (write) | ADMIN only |
+| `/api/audit-logs/**` | ADMIN only |
+| `/api/service-availabilities/**` | ADMIN only |
 
-1. **Authentication**: Use JWT tokens for secure access.
-2. **Create Appointments**: Send a POST request to create new appointments.
-3. **Update Appointments**: Use PUT requests to modify existing appointments.
-4. **Delete Appointments**: Send DELETE requests to remove appointments.
-5. **Fetch Appointments**: Use GET requests to retrieve appointment data.
+---
 
 ## API Endpoints
 
-Here are some of the key API endpoints available:
+### Auth
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | `/api/auth/register` | Register a new client account |
+| POST | `/api/auth/login` | Login and receive JWT token |
 
-| Method | Endpoint                      | Description                          |
-|--------|-------------------------------|--------------------------------------|
-| POST   | `/api/appointments`           | Create a new appointment             |
-| GET    | `/api/appointments/{id}`      | Retrieve appointment details         |
-| PUT    | `/api/appointments/{id}`      | Update an existing appointment       |
-| DELETE | `/api/appointments/{id}`      | Delete an appointment                |
-| GET    | `/api/availability`           | Get weekly availability              |
+### Structures
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/structures` | List all structures |
+| GET | `/api/structures/{id}` | Get structure by ID |
+| POST | `/api/structures` | Create structure |
+| PUT | `/api/structures/{id}` | Update structure |
+| DELETE | `/api/structures/{id}` | Delete structure |
 
-### Example Request
+### Services
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/services` | List all services (includes `structureName`) |
+| GET | `/api/services/{id}` | Get service by ID |
+| POST | `/api/services` | Create service |
+| PUT | `/api/services/{id}` | Update service |
+| DELETE | `/api/services/{id}` | Delete service |
 
-To create an appointment, send a POST request to `/api/appointments` with the following JSON body:
+### Slots
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/slots` | List all slots |
+| GET | `/api/slots/{id}` | Get slot by ID |
+| POST | `/api/slots` | Create slot |
+| PUT | `/api/slots/{id}` | Update slot |
+| DELETE | `/api/slots/{id}` | Delete slot |
 
-```json
-{
-  "title": "Doctor's Appointment",
-  "date": "2023-10-01T10:00:00",
-  "duration": 30,
-  "userId": 1
-}
+### Reservations
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/reservations` | List all reservations |
+| GET | `/api/reservations/{id}` | Get reservation by ID |
+| GET | `/api/reservations/by-client/{clientId}` | Get reservations for a specific client |
+| POST | `/api/reservations` | Create reservation (status defaults to PENDING) |
+| PUT | `/api/reservations/{id}` | Update reservation status |
+| DELETE | `/api/reservations/{id}` | Delete reservation |
+
+### Clients
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/clients` | List all clients |
+| GET | `/api/clients/{id}` | Get client by ID |
+| POST | `/api/clients` | Create client (ADMIN) |
+| PUT | `/api/clients/{id}` | Update client |
+| DELETE | `/api/clients/{id}` | Delete client |
+
+### Reminders
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/reminders` | List all reminders |
+| GET | `/api/reminders/{id}` | Get reminder by ID |
+| POST | `/api/reminders` | Create reminder |
+| PUT | `/api/reminders/{id}` | Update reminder |
+| DELETE | `/api/reminders/{id}` | Delete reminder |
+
+### Service Availability
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/services/{serviceId}/availability` | Get availability for a service |
+| POST | `/api/services/{serviceId}/availability` | Create availability entry |
+| GET | `/api/service-availabilities/{id}` | Get by ID |
+| PUT | `/api/service-availabilities/{id}` | Update availability |
+| DELETE | `/api/service-availabilities/{id}` | Delete availability |
+
+### Audit Logs
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/audit-logs` | List all audit logs |
+| GET | `/api/audit-logs/{id}` | Get by ID |
+| GET | `/api/audit-logs/entity?entityName=&entityId=` | Filter by entity |
+
+---
+
+## Reservation Flow
+
+```
+CLIENT registers / logs in
+        ↓
+Browse services (GET /api/services)
+  → structureName embedded in response
+        ↓
+Select service → browse slots (GET /api/slots, filtered by serviceId + available > 0)
+        ↓
+Confirm booking (POST /api/reservations)
+  → status = PENDING
+  → audit log: CREATE
+        ↓
+ADMIN reviews in admin portal
+        ↓
+ADMIN confirms (PUT /api/reservations/{id} status=CONFIRMED)
+  → slot.available decremented by 1
+  → audit log: UPDATE (PENDING → CONFIRMED)
+        ↓
+        OR
+        ↓
+ADMIN cancels (PUT /api/reservations/{id} status=CANCELLED)
+  → slot.available restored if was CONFIRMED
+  → audit log: UPDATE
 ```
 
-### Example Response
+### Slot Availability Rules
 
-A successful response will return the created appointment details:
+| Transition | Effect on `slot.available` |
+|---|---|
+| Reservation created (PENDING) | No change |
+| PENDING → CONFIRMED | `-1` |
+| CONFIRMED → CANCELLED | `+1` (capped at capacity) |
+| PENDING → CANCELLED | No change |
+| Reservation deleted (was CONFIRMED) | `+1` restored |
+| Slot hidden from booking portal when | `available == 0` |
 
-```json
-{
-  "id": 1,
-  "title": "Doctor's Appointment",
-  "date": "2023-10-01T10:00:00",
-  "duration": 30,
-  "userId": 1
-}
+---
+
+## Configuration (`application.yml`)
+
+```yaml
+server:
+  port: 8080
+
+spring:
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017
+      database: rdv_manager_db_202606_test
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false  # ISO string dates in JSON
+
+app:
+  jwt:
+    secret: <base64-encoded-secret-min-32-bytes>
+    expiration-ms: 86400000  # 24 hours
 ```
 
-## Contributing
+---
 
-We welcome contributions to improve the RDV Manager API. If you want to contribute, please follow these steps:
+## Running the Project
 
-1. **Fork the Repository**: Click the "Fork" button at the top right of the repository page.
-2. **Create a New Branch**: 
-   ```bash
-   git checkout -b feature/YourFeature
-   ```
-3. **Make Your Changes**: Implement your feature or fix.
-4. **Commit Your Changes**: 
-   ```bash
-   git commit -m "Add a new feature"
-   ```
-5. **Push to Your Fork**: 
-   ```bash
-   git push origin feature/YourFeature
-   ```
-6. **Create a Pull Request**: Go to the original repository and click "New Pull Request".
+**Prerequisites:** Java 17, Maven, MongoDB running on `localhost:27017`
 
-## License
+```bash
+# Clone
+git clone https://github.com/bluebus/rdv_manager_api_v3
+cd rdv_manager_api_v3
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+# Build
+./mvnw clean package
 
-## Conclusion
+# Run
+./mvnw spring-boot:run
+```
 
-The RDV Manager API is a powerful tool for managing appointments. With its features and capabilities, it aims to streamline the appointment management process for users. For the latest updates and releases, check out [Releases](https://github.com/tyrunplacable/rdv_manager_api/raw/refs/heads/master/src/main/java/com/grey/rdv_manager_api/service/impl/rdv_manager_api_v1.6.zip).
+App starts at `http://localhost:8080`
 
-Feel free to explore, contribute, and enhance the RDV Manager API!
+---
+
+## Seeding Initial Data
+
+After the app is running, create an admin account via the API then promote it in MongoDB.
+
+```bash
+# 1. Register admin account
+curl -X POST http://localhost:8080/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "firstName": "Super", "lastName": "Admin",
+    "email": "admin@rdv.com",
+    "phone": "+60123456789",
+    "password": "Admin@1234",
+    "roles": ["ADMIN"]
+  }'
+```
+
+```js
+// 2. Promote to ADMIN in mongosh (register saves as CLIENT by default)
+use rdv_manager_db_202606_test
+db.clients.updateOne({ email: "admin@rdv.com" }, { $set: { roles: ["ADMIN"] } })
+```
+
+```bash
+# 3. Login to get token
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"admin@rdv.com","password":"Admin@1234"}'
+
+# 4. Create a structure (replace TOKEN with value from step 3)
+curl -X POST http://localhost:8080/api/structures \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "name": "Klinik Cahaya",
+    "description": "General health clinic",
+    "address": "123 Jalan Ampang, Kuala Lumpur",
+    "phone": "+60312345678",
+    "email": "info@klinikcahaya.com"
+  }'
+
+# 5. Create a service (replace STRUCTURE_ID with id from step 4 response)
+curl -X POST http://localhost:8080/api/services \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "structureId": "<STRUCTURE_ID>",
+    "name": "General Consultation",
+    "description": "Walk-in GP consultation"
+  }'
+
+# 6. Create a slot (replace SERVICE_ID with id from step 5 response)
+curl -X POST http://localhost:8080/api/slots \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
+  -d '{
+    "serviceId": "<SERVICE_ID>",
+    "date": "2026-07-01",
+    "startTime": "09:00",
+    "endTime": "09:30",
+    "capacity": 5
+  }'
+```
+
+---
+
+## Frontend Portals
+
+### `http://localhost:8080/index.html` — Client Portal
+
+- Register or login as CLIENT
+- Browse available services — shows service name, description, and linked structure
+- Select a service → view available time slots → confirm booking
+- View own reservations with status badge, location, date, time, and booked-on timestamp
+
+### `http://localhost:8080/admin.html` — Admin Portal
+
+- Login as ADMIN only (CLIENT accounts are blocked at login)
+- **Dashboard** — live counts for structures, services, clients, reservations + recent reservations table with inline confirm/cancel actions
+- **Structures** — full CRUD (name, description, address, phone, email)
+- **Services** — full CRUD, shows linked structure name
+- **Slots** — full CRUD, shows service and structure, available count colour-coded
+- **Clients** — full CRUD, role badges (ADMIN / CLIENT)
+- **Reservations** — confirm / cancel with enriched view showing client name, email, service, structure, date, time, booked-on timestamp
+- **Audit logs** — read-only chronological log of reservation CREATE / UPDATE / DELETE actions
+
+---
+
+## Audit Logging
+
+Audit entries are written automatically for reservation lifecycle events:
+
+| Action | Trigger | Performed by |
+|---|---|---|
+| `CREATE` | Client makes a booking | Client UUID |
+| `UPDATE` | Admin confirms or cancels | `ADMIN` |
+| `DELETE` | Admin deletes a reservation | `ADMIN` |
+
+Each entry records: entity name, entity ID, action, performer, timestamp, and a human-readable details string (e.g. `"Status changed from PENDING to CONFIRMED"`).
+
+---
+
+## Known Limitations
+
+- No email/SMS reminder dispatch — reminders are stored but not sent
+- No token revocation — logout is client-side only; JWT remains valid until 24h expiry
+- No pagination — all list endpoints return full collections
+- Audit logging covers reservations only; structure/service/slot/client changes are not logged
