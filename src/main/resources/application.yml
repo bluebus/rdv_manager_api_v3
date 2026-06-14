@@ -26,5 +26,5 @@ logging:
 
 app: # 202606 added for JWT config
   jwt:
-    secret: your-256-bit-base64-encoded-secret-key-here   # min 32 chars
+    secret: Overvalue-Nicotine-Graduate-Kilogram-Handclap   # min 32 chars
     expiration-ms: 86400000   # 24 hours
