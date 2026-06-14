@@ -1,9 +1,9 @@
 package com.grey.rdv_manager_api.payload.request;
 
 import jakarta.validation.constraints.*;
+import com.grey.rdv_manager_api.domain.enums.Role;
 import java.util.Set;
 
-import javax.management.relation.Role;
 
 public record UpdateClientRequest(
     /*String firstName,
@@ -24,18 +24,15 @@ public record UpdateClientRequest(
     @Email(message = "Email must be a valid email address")
     String email,
 
-    // Optional but must be numeric if provided
     @Pattern(
         regexp = "^(\\+?[0-9.\\-\\s]{6,20})?$",
         message = "Phone must be 6–20 digits, e.g. +60123456789"
     )
     String phone,
 
-    // Optional password update — if provided must meet minimum length
     @Size(min = 8, message = "Password must be at least 8 characters")
     String password,
 
-    // Values must match Role enum
     Set<Role> roles
 
 ) {}
