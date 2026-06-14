@@ -41,6 +41,7 @@ C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\payload\re
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\repository\ServiceAvailabilityRepository.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\service\impl\StructureServiceImpl.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\repository\ClientRepository.java
+C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\exception\GlobalExceptionHandler.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\service\ServiceEntityService.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\repository\AuditLogRepository.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\controller\ReminderController.java

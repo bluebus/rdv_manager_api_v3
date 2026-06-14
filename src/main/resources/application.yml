@@ -7,7 +7,7 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017
-      database: rdv_manager_db
+      database: rdv_manager_db_202606_test
   profiles:
     active: debug
   servlet:

@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RDV Manager — Admin</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    :root {
+      --color-background-primary: #ffffff;
+      --color-background-secondary: #f5f5f4;
+      --color-background-tertiary: #f0ede8;
+      --color-background-info: #e6f1fb;
+      --color-background-success: #eaf3de;
+      --color-background-danger: #fcebeb;
+      --color-background-warning: #faeeda;
+      --color-text-primary: #1a1a19;
+      --color-text-secondary: #5f5e5a;
+      --color-text-tertiary: #888780;
+      --color-text-info: #0c447c;
+      --color-text-success: #27500a;
+      --color-text-danger: #791f1f;
+      --color-text-warning: #633806;
+      --color-border-tertiary: rgba(0,0,0,0.12);
+      --color-border-secondary: rgba(0,0,0,0.25);
+      --color-border-primary: rgba(0,0,0,0.4);
+      --color-border-info: #85b7eb;
+      --color-border-success: #97c459;
+      --color-border-danger: #f09595;
+      --color-border-warning: #ef9f27;
+      --font-sans: system-ui, -apple-system, sans-serif;
+      --border-radius-md: 8px;
+      --border-radius-lg: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-background-primary: #1e1e1c;
+        --color-background-secondary: #2a2a28;
+        --color-background-tertiary: #242422;
+        --color-background-info: #042c53;
+        --color-background-success: #173404;
+        --color-background-danger: #501313;
+        --color-background-warning: #412402;
+        --color-text-primary: #e8e6e0;
+        --color-text-secondary: #b4b2a9;
+        --color-text-tertiary: #888780;
+        --color-text-info: #85b7eb;
+        --color-text-success: #97c459;
+        --color-text-danger: #f09595;
+        --color-text-warning: #ef9f27;
+        --color-border-tertiary: rgba(255,255,255,0.1);
+        --color-border-secondary: rgba(255,255,255,0.2);
+        --color-border-primary: rgba(255,255,255,0.3);
+      }
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--font-sans); background: var(--color-background-tertiary); min-height: 100vh; color: var(--color-text-primary); }
+
+    /* ── LAYOUT ── */
+    .layout { display: flex; min-height: 100vh; }
+    .sidebar {
+      width: 220px; flex-shrink: 0;
+      background: var(--color-background-primary);
+      border-right: 0.5px solid var(--color-border-tertiary);
+      padding: 1.25rem 0;
+      position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    }
+    .sidebar-logo { padding: 0 1.25rem 1.25rem; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 0.75rem; }
+    .sidebar-logo p { font-size: 15px; font-weight: 500; }
+    .sidebar-logo span { font-size: 11px; color: var(--color-text-secondary); background: var(--color-background-warning); color: var(--color-text-warning); padding: 1px 8px; border-radius: 4px; }
+    .nav-section { padding: 0.5rem 1.25rem 0.25rem; font-size: 11px; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
+    .nav-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 1.25rem; font-size: 13px; cursor: pointer;
+      color: var(--color-text-secondary); border: none; background: none; width: 100%; text-align: left;
+      transition: background 0.1s;
+    }
+    .nav-item:hover { background: var(--color-background-secondary); color: var(--color-text-primary); }
+    .nav-item.active { background: var(--color-background-info); color: var(--color-text-info); font-weight: 500; }
+    .nav-item i { font-size: 16px; }
+    .main { flex: 1; padding: 1.5rem; overflow-y: auto; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
+    .topbar h1 { font-size: 18px; font-weight: 500; }
+
+    /* ── CARDS / TABLES ── */
+    .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
+    .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .card-title { font-size: 14px; font-weight: 500; }
+    .hidden { display: none !important; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { text-align: left; padding: 8px 10px; color: var(--color-text-secondary); font-weight: 500; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 12px; }
+    td { padding: 8px 10px; border-bottom: 0.5px solid var(--color-border-tertiary); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--color-background-secondary); }
+
+    /* ── FORMS ── */
+    label { display: block; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 3px; margin-top: 10px; }
+    label:first-child { margin-top: 0; }
+    input, select, textarea {
+      width: 100%; padding: 7px 10px; font-size: 13px;
+      border: 0.5px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-md);
+      background: var(--color-background-primary);
+      color: var(--color-text-primary); outline: none;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--color-border-primary); }
+    textarea { resize: vertical; min-height: 60px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+    /* ── BUTTONS ── */
+    .btn { padding: 7px 14px; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: var(--border-radius-md); transition: opacity 0.15s; border: 0.5px solid transparent; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
+    .btn-primary:hover:not(:disabled) { opacity: 0.8; }
+    .btn-secondary { background: transparent; color: var(--color-text-primary); border-color: var(--color-border-secondary); }
+    .btn-secondary:hover:not(:disabled) { background: var(--color-background-secondary); }
+    .btn-danger { background: transparent; color: var(--color-text-danger); border-color: var(--color-border-danger); }
+    .btn-danger:hover:not(:disabled) { background: var(--color-background-danger); }
+    .btn-success { background: transparent; color: var(--color-text-success); border-color: var(--color-border-success); }
+    .btn-success:hover:not(:disabled) { background: var(--color-background-success); }
+    .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+    /* ── ALERTS / BADGES ── */
+    .alert { padding: 8px 12px; border-radius: var(--border-radius-md); font-size: 13px; margin-bottom: 1rem; }
+    .alert-error   { background: var(--color-background-danger);  color: var(--color-text-danger);  border: 0.5px solid var(--color-border-danger); }
+    .alert-success { background: var(--color-background-success); color: var(--color-text-success); border: 0.5px solid var(--color-border-success); }
+    .alert-info    { background: var(--color-background-info);    color: var(--color-text-info);    border: 0.5px solid var(--color-border-info); }
+    .badge { display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 500; }
+    .badge-pending   { background: #faeeda; color: #633806; }
+    .badge-confirmed { background: #eaf3de; color: #27500a; }
+    .badge-cancelled { background: #fcebeb; color: #791f1f; }
+    .badge-admin  { background: var(--color-background-danger); color: var(--color-text-danger); }
+    .badge-staff  { background: var(--color-background-info);  color: var(--color-text-info); }
+    .badge-client { background: var(--color-background-secondary); color: var(--color-text-secondary); }
+
+    /* ── MODAL ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 100; }
+    .modal { background: var(--color-background-primary); border-radius: var(--border-radius-lg); padding: 1.5rem; width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto; border: 0.5px solid var(--color-border-tertiary); }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
+    .modal-title { font-size: 15px; font-weight: 500; }
+    .modal-close { background: none; border: none; cursor: pointer; color: var(--color-text-tertiary); font-size: 18px; padding: 2px; }
+    .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; padding-top: 1rem; border-top: 0.5px solid var(--color-border-tertiary); }
+
+    /* ── LOGIN ── */
+    .login-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
+    .login-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 2rem; width: 380px; }
+    .login-card h2 { font-size: 18px; font-weight: 500; margin-bottom: 0.25rem; }
+    .login-card p { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 1.5rem; }
+
+    /* ── MISC ── */
+    .spinner { display: inline-block; width: 13px; height: 13px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: -2px; margin-right: 5px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty { text-align: center; padding: 2rem; color: var(--color-text-tertiary); font-size: 13px; }
+    .empty i { font-size: 28px; display: block; margin-bottom: 6px; }
+    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.5rem; }
+    .stat-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; }
+    .stat-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
+    .stat-value { font-size: 24px; font-weight: 500; }
+    .mono { font-family: monospace; font-size: 11px; color: var(--color-text-tertiary); }
+    .actions { display: flex; gap: 6px; }
+    #page-msg { margin-bottom: 1rem; }
+  </style>
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ── -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-card">
+      <h2>Admin portal</h2>
+      <p>Sign in with an ADMIN account to continue</p>
+      <div id="login-msg"></div>
+      <label>Email</label>
+      <input type="email" id="login-email" placeholder="admin@example.com" style="margin-bottom:10px" onkeydown="if(event.key==='Enter')doLogin()">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" style="margin-bottom:16px" onkeydown="if(event.key==='Enter')doLogin()">
+      <button class="btn btn-primary" style="width:100%" onclick="doLogin()" id="login-btn">
+        <span id="login-spinner" class="spinner hidden"></span>Sign in
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ── ADMIN APP ── -->
+<div id="admin-app" class="hidden">
+  <div class="layout">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <p>RDV Manager</p>
+        <span>Admin</span>
+      </div>
+      <div class="nav-section">Overview</div>
+      <button class="nav-item active" onclick="showSection('dashboard')" id="nav-dashboard">
+        <i class="ti ti-layout-dashboard"></i>Dashboard
+      </button>
+      <div class="nav-section">Management</div>
+      <button class="nav-item" onclick="showSection('structures')" id="nav-structures">
+        <i class="ti ti-building"></i>Structures
+      </button>
+      <button class="nav-item" onclick="showSection('services')" id="nav-services">
+        <i class="ti ti-briefcase"></i>Services
+      </button>
+      <button class="nav-item" onclick="showSection('slots')" id="nav-slots">
+        <i class="ti ti-clock"></i>Slots
+      </button>
+      <button class="nav-item" onclick="showSection('clients')" id="nav-clients">
+        <i class="ti ti-users"></i>Clients
+      </button>
+      <button class="nav-item" onclick="showSection('reservations')" id="nav-reservations">
+        <i class="ti ti-calendar-check"></i>Reservations
+      </button>
+      <div class="nav-section">System</div>
+      <button class="nav-item" onclick="showSection('auditlogs')" id="nav-auditlogs">
+        <i class="ti ti-history"></i>Audit logs
+      </button>
+      <button class="nav-item" onclick="doLogout()" style="margin-top:auto">
+        <i class="ti ti-logout"></i>Sign out
+      </button>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main">
+      <div class="topbar">
+        <h1 id="section-title">Dashboard</h1>
+        <span style="font-size:13px;color:var(--color-text-secondary)" id="topbar-user"></span>
+      </div>
+      <div id="page-msg"></div>
+
+      <!-- ── DASHBOARD ── -->
+      <div id="section-dashboard">
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-label">Structures</div><div class="stat-value" id="stat-structures">—</div></div>
+          <div class="stat-card"><div class="stat-label">Services</div><div class="stat-value" id="stat-services">—</div></div>
+          <div class="stat-card"><div class="stat-label">Clients</div><div class="stat-value" id="stat-clients">—</div></div>
+          <div class="stat-card"><div class="stat-label">Reservations</div><div class="stat-value" id="stat-reservations">—</div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Recent reservations</span></div>
+          <div id="dash-reservations"><div class="empty"><i class="ti ti-loader"></i>Loading…</div></div>
+        </div>
+      </div>
+
+      <!-- ── STRUCTURES ── -->
+      <div id="section-structures" class="hidden">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Structures</span>
+            <button class="btn btn-primary btn-sm" onclick="openModal('structure',null)">
+              <i class="ti ti-plus" style="font-size:13px;vertical-align:-1px"></i> Add structure
+            </button>
+          </div>
+          <div id="structures-table"><div class="empty"><i class="ti ti-loader"></i>Loading…</div></div>
+        </div>
+      </div>
+
+      <!-- ── SERVICES ── -->
+      <div id="section-services" class="hidden">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Services</span>
+            <button class="btn btn-primary btn-sm" onclick="openModal('service',null)">
+              <i class="ti ti-plus" style="font-size:13px;vertical-align:-1px"></i> Add service
+            </button>
+          </div>
+          <div id="services-table"><div class="empty"><i class="ti ti-loader"></i>Loading…</div></div>
+        </div>
+      </div>
+
+      <!-- ── SLOTS ── -->
+      <div id="section-slots" class="hidden">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Time slots</span>
+            <button class="btn btn-primary btn-sm" onclick="openModal('slot',null)">
+              <i class="ti ti-plus" style="font-size:13px;vertical-align:-1px"></i> Add slot
+            </button>
+          </div>
+          <div id="slots-table"><div class="empty"><i class="ti ti-loader"></i>Loading…</div></div>
+        </div>
+      </div>
+
+      <!-- ── CLIENTS ── -->
+      <div id="section-clients" class="hidden">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Clients</span>
+            <button class="btn btn-primary btn-sm" onclick="openModal('client',null)">
+              <i class="ti ti-plus" style="font-size:13px;vertical-align:-1px"></i> Add client
+            </button>
+          </div>
+          <div id="clients-table"><div class="empty"><i class="ti ti-loader"></i>Loading…</div></div>
+        </div>
+      </div>
+
+      <!-- ── RESERVATIONS ── -->
+      <div id="section-reservations" class="hidden">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Reservations</span>
+            <span style="font-size:12px;color:var(--color-text-secondary)">Update status to confirm or cancel bookings</span>
+          </div>
+          <div id="reservations-table"><div class="empty"><i class="ti ti-loader"></i>Loading…</div></div>
+        </div>
+      </div>
+
+      <!-- ── AUDIT LOGS ── -->
+      <div id="section-auditlogs" class="hidden">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Audit logs</span>
+            <span style="font-size:12px;color:var(--color-text-secondary)">Read-only system log</span>
+          </div>
+          <div id="auditlogs-table"><div class="empty"><i class="ti ti-loader"></i>Loading…</div></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ── MODAL ── -->
+<div id="modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="modal-title">Edit</span>
+      <button class="modal-close" onclick="closeModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div id="modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitModal()" id="modal-save">
+        <span id="modal-spinner" class="spinner hidden"></span>Save
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── CONFIG ───────────────────────────────────────────────────────────────────
+const API = '';   // same origin — Spring Boot serves both
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let token = null;
+let currentAdmin = null;
+let modalType = null;
+let modalData = null;     // null = create, object = edit
+let structures = [];      // cached for dropdowns
+
+// ─── HELPERS ──────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+
+function esc(s) {
+  if (s == null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showMsg(type, text) {
+  $('page-msg').innerHTML = `<div class="alert alert-${type}">${text}</div>`;
+  if (type !== 'error') setTimeout(() => { $('page-msg').innerHTML = ''; }, 4000);
+}
+
+function authHeaders() {
+  return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
+}
+
+function fmtDate(s) { return s ? new Date(s).toLocaleDateString() : '—'; }
+function fmtDateTime(s) { return s ? new Date(s).toLocaleString() : '—'; }
+
+function setLoading(spinnerId, btnId, on) {
+  $(spinnerId).classList.toggle('hidden', !on);
+  $(btnId).disabled = on;
+}
+
+// ─── AUTH ─────────────────────────────────────────────────────────────────────
+// POST /api/auth/login — only allows ADMIN role through
+async function doLogin() {
+  const email = $('login-email').value.trim();
+  const pass  = $('login-password').value;
+  if (!email || !pass) return showLoginMsg('error', 'Enter email and password.');
+
+  setLoading('login-spinner', 'login-btn', true);
+  try {
+    const res = await fetch(`${API}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password: pass })
+    });
+    if (res.ok) {
+      const data = await res.json();
+      // roles is List<Role> serialised as ["ADMIN"] — check first element
+      const roles = (data.roles || []).map(r => typeof r === 'string' ? r : r.toString());
+      if (!roles.includes('ADMIN')) {
+        return showLoginMsg('error', 'Access denied. ADMIN role required.');
+      }
+      token = data.token;
+      currentAdmin = data;
+      $('login-screen').classList.add('hidden');
+      $('admin-app').classList.remove('hidden');
+      $('topbar-user').textContent = data.email;
+      showSection('dashboard');
+    } else if (res.status === 401) {
+      showLoginMsg('error', 'Invalid email or password.');
+    } else {
+      showLoginMsg('error', `Login failed (HTTP ${res.status}).`);
+    }
+  } catch(e) {
+    showLoginMsg('error', 'Cannot reach server. Is the API running?');
+  }
+  setLoading('login-spinner', 'login-btn', false);
+}
+
+function showLoginMsg(type, text) {
+  $('login-msg').innerHTML = `<div class="alert alert-${type}" style="margin-bottom:12px">${text}</div>`;
+}
+
+function doLogout() {
+  token = null; currentAdmin = null;
+  $('admin-app').classList.add('hidden');
+  $('login-screen').classList.remove('hidden');
+  $('login-password').value = '';
+  $('login-msg').innerHTML = '';
+}
+
+// ─── SECTION NAVIGATION ───────────────────────────────────────────────────────
+const sections = ['dashboard','structures','services','slots','clients','reservations','auditlogs'];
+
+function showSection(name) {
+  sections.forEach(s => {
+    $(`section-${s}`).classList.toggle('hidden', s !== name);
+    $(`nav-${s}`)?.classList.toggle('active', s === name);
+  });
+  const titles = {
+    dashboard:'Dashboard', structures:'Structures', services:'Services',
+    slots:'Time slots', clients:'Clients', reservations:'Reservations', auditlogs:'Audit logs'
+  };
+  $('section-title').textContent = titles[name] || name;
+  $('page-msg').innerHTML = '';
+  loadSection(name);
+}
+
+function loadSection(name) {
+  switch(name) {
+    case 'dashboard':    loadDashboard(); break;
+    case 'structures':   loadStructures(); break;
+    case 'services':     loadServices(); break;
+    case 'slots':        loadSlots(); break;
+    case 'clients':      loadClients(); break;
+    case 'reservations': loadReservations(); break;
+    case 'auditlogs':    loadAuditLogs(); break;
+  }
+}
+
+// ─── DASHBOARD ────────────────────────────────────────────────────────────────
+async function loadDashboard() {
+  // Parallel fetch of all counts and recent reservations
+  const [sRes, svcRes, cRes, rRes] = await Promise.all([
+    fetch(`${API}/api/structures`, { headers: authHeaders() }),
+    fetch(`${API}/api/services`,   { headers: authHeaders() }),
+    fetch(`${API}/api/clients`,    { headers: authHeaders() }),
+    fetch(`${API}/api/reservations`, { headers: authHeaders() })
+  ]);
+  if (sRes.ok)   { const d = await sRes.json();   $('stat-structures').textContent   = d.length; }
+  if (svcRes.ok) { const d = await svcRes.json(); $('stat-services').textContent     = d.length; }
+  if (cRes.ok)   { const d = await cRes.json();   $('stat-clients').textContent      = d.length; }
+  if (rRes.ok)   {
+    const d = await rRes.json();
+    $('stat-reservations').textContent = d.length;
+    // Show latest 10 reservations
+    const recent = d.slice(-10).reverse();
+    if (!recent.length) {
+      $('dash-reservations').innerHTML = '<div class="empty"><i class="ti ti-calendar-off"></i>No reservations yet</div>';
+    } else {
+      $('dash-reservations').innerHTML = `
+        <table>
+          <thead><tr><th>ID</th><th>Client ID</th><th>Slot ID</th><th>Status</th><th>Created</th></tr></thead>
+          <tbody>${recent.map(r => `
+            <tr>
+              <td class="mono">${esc(r.id?.substring(0,8))}…</td>
+              <td class="mono">${esc(r.clientId?.substring(0,8))}…</td>
+              <td class="mono">${esc(r.slotId?.substring(0,8))}…</td>
+              <td><span class="badge badge-${(r.status||'').toLowerCase()}">${esc(r.status)}</span></td>
+              <td>${fmtDate(r.createdAt)}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>`;
+    }
+  }
+}
+
+// ─── STRUCTURES ──────────────────────────────────────────────────────────────
+// GET /api/structures  — list all structures
+async function loadStructures() {
+  $('structures-table').innerHTML = '<div class="empty"><i class="ti ti-loader"></i>Loading…</div>';
+  try {
+    const res = await fetch(`${API}/api/structures`, { headers: authHeaders() });
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    structures = data; // cache for service dropdowns
+    if (!data.length) {
+      $('structures-table').innerHTML = '<div class="empty"><i class="ti ti-building-off"></i>No structures yet</div>';
+      return;
+    }
+    $('structures-table').innerHTML = `
+      <table>
+        <thead><tr><th>Name</th><th>Address</th><th>Phone</th><th>Email</th><th>Timezone</th><th>Actions</th></tr></thead>
+        <tbody>${data.map(s => `
+          <tr>
+            <td style="font-weight:500">${esc(s.name)}</td>
+            <td>${esc(s.address)}</td>
+            <td>${esc(s.phone)}</td>
+            <td>${esc(s.email)}</td>
+            <td>${esc(s.timezone)}</td>
+            <td><div class="actions">
+              <button class="btn btn-secondary btn-sm" onclick='openModal("structure",${JSON.stringify(s)})'><i class="ti ti-edit" style="font-size:12px"></i></button>
+              <button class="btn btn-danger btn-sm" onclick='deleteItem("structures","${s.id}","structure")'><i class="ti ti-trash" style="font-size:12px"></i></button>
+            </div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } catch(e) {
+    $('structures-table').innerHTML = '<div class="empty" style="color:var(--color-text-danger)"><i class="ti ti-alert-circle"></i>Failed to load</div>';
+  }
+}
+
+// ─── SERVICES ─────────────────────────────────────────────────────────────────
+// GET /api/services  — list all services (ADMIN+STAFF)
+async function loadServices() {
+  $('services-table').innerHTML = '<div class="empty"><i class="ti ti-loader"></i>Loading…</div>';
+  try {
+    // Ensure structures are cached for display
+    if (!structures.length) {
+      const sr = await fetch(`${API}/api/structures`, { headers: authHeaders() });
+      if (sr.ok) structures = await sr.json();
+    }
+    const res = await fetch(`${API}/api/services`, { headers: authHeaders() });
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    if (!data.length) {
+      $('services-table').innerHTML = '<div class="empty"><i class="ti ti-briefcase-off"></i>No services yet</div>';
+      return;
+    }
+    const structMap = Object.fromEntries(structures.map(s => [s.id, s.name]));
+    $('services-table').innerHTML = `
+      <table>
+        <thead><tr><th>Name</th><th>Description</th><th>Structure</th><th>Timezone</th><th>Actions</th></tr></thead>
+        <tbody>${data.map(s => `
+          <tr>
+            <td style="font-weight:500">${esc(s.name)}</td>
+            <td>${esc(s.description || '—')}</td>
+            <td>${esc(structMap[s.structureId] || s.structureId?.substring(0,8)+'…')}</td>
+            <td>${esc(s.timezone)}</td>
+            <td><div class="actions">
+              <button class="btn btn-secondary btn-sm" onclick='openModal("service",${JSON.stringify(s)})'><i class="ti ti-edit" style="font-size:12px"></i></button>
+              <button class="btn btn-danger btn-sm" onclick='deleteItem("services","${s.id}","service")'><i class="ti ti-trash" style="font-size:12px"></i></button>
+            </div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } catch(e) {
+    $('services-table').innerHTML = '<div class="empty" style="color:var(--color-text-danger)"><i class="ti ti-alert-circle"></i>Failed to load</div>';
+  }
+}
+
+// ─── SLOTS ────────────────────────────────────────────────────────────────────
+// GET /api/slots  — list all time slots (ADMIN+STAFF can manage, any auth can GET)
+async function loadSlots() {
+  $('slots-table').innerHTML = '<div class="empty"><i class="ti ti-loader"></i>Loading…</div>';
+  try {
+    const [svcRes, slotRes] = await Promise.all([
+      fetch(`${API}/api/services`, { headers: authHeaders() }),
+      fetch(`${API}/api/slots`,    { headers: authHeaders() })
+    ]);
+    const services = svcRes.ok ? await svcRes.json() : [];
+    if (!slotRes.ok) throw new Error(slotRes.status);
+    const data = await slotRes.json();
+    if (!data.length) {
+      $('slots-table').innerHTML = '<div class="empty"><i class="ti ti-clock-off"></i>No slots yet</div>';
+      return;
+    }
+    const svcMap = Object.fromEntries(services.map(s => [s.id, s.name]));
+    $('slots-table').innerHTML = `
+      <table>
+        <thead><tr><th>Service</th><th>Date</th><th>Start</th><th>End</th><th>Capacity</th><th>Available</th><th>Actions</th></tr></thead>
+        <tbody>${data.map(s => `
+          <tr>
+            <td>${esc(svcMap[s.serviceId] || s.serviceId?.substring(0,8)+'…')}</td>
+            <td>${esc(s.date)}</td>
+            <td>${esc(s.startTime)}</td>
+            <td>${esc(s.endTime)}</td>
+            <td>${s.capacity}</td>
+            <td><span style="color:${s.available>0?'var(--color-text-success)':'var(--color-text-danger)'};font-weight:500">${s.available}</span></td>
+            <td><div class="actions">
+              <button class="btn btn-secondary btn-sm" onclick='openModal("slot",${JSON.stringify(s)})'><i class="ti ti-edit" style="font-size:12px"></i></button>
+              <button class="btn btn-danger btn-sm" onclick='deleteItem("slots","${s.id}","slot")'><i class="ti ti-trash" style="font-size:12px"></i></button>
+            </div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } catch(e) {
+    $('slots-table').innerHTML = '<div class="empty" style="color:var(--color-text-danger)"><i class="ti ti-alert-circle"></i>Failed to load</div>';
+  }
+}
+
+// ─── CLIENTS ──────────────────────────────────────────────────────────────────
+// GET /api/clients  — list all clients (ADMIN+STAFF)
+async function loadClients() {
+  $('clients-table').innerHTML = '<div class="empty"><i class="ti ti-loader"></i>Loading…</div>';
+  try {
+    const res = await fetch(`${API}/api/clients`, { headers: authHeaders() });
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    if (!data.length) {
+      $('clients-table').innerHTML = '<div class="empty"><i class="ti ti-user-off"></i>No clients yet</div>';
+      return;
+    }
+    $('clients-table').innerHTML = `
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Roles</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody>${data.map(c => {
+          const roles = Array.isArray(c.roles) ? c.roles : [];
+          const roleBadges = roles.map(r => {
+            const rv = typeof r === 'string' ? r : String(r);
+            return `<span class="badge badge-${rv.toLowerCase()}">${esc(rv)}</span>`;
+          }).join(' ');
+          return `<tr>
+            <td style="font-weight:500">${esc(c.firstName)} ${esc(c.lastName)}</td>
+            <td>${esc(c.email)}</td>
+            <td>${esc(c.phone || '—')}</td>
+            <td>${roleBadges}</td>
+            <td>${fmtDate(c.createdAt)}</td>
+            <td><div class="actions">
+              <button class="btn btn-secondary btn-sm" onclick='openModal("client",${JSON.stringify(c)})'><i class="ti ti-edit" style="font-size:12px"></i></button>
+              <button class="btn btn-danger btn-sm" onclick='deleteItem("clients","${c.id}","client")'><i class="ti ti-trash" style="font-size:12px"></i></button>
+            </div></td>
+          </tr>`;
+        }).join('')}
+        </tbody>
+      </table>`;
+  } catch(e) {
+    $('clients-table').innerHTML = '<div class="empty" style="color:var(--color-text-danger)"><i class="ti ti-alert-circle"></i>Failed to load</div>';
+  }
+}
+
+// ─── RESERVATIONS ─────────────────────────────────────────────────────────────
+// GET /api/reservations  — any authenticated user
+// PUT /api/reservations/{id}  — update status (CONFIRMED / CANCELLED)
+async function loadReservations() {
+  $('reservations-table').innerHTML = '<div class="empty"><i class="ti ti-loader"></i>Loading…</div>';
+  try {
+    const res = await fetch(`${API}/api/reservations`, { headers: authHeaders() });
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    if (!data.length) {
+      $('reservations-table').innerHTML = '<div class="empty"><i class="ti ti-calendar-off"></i>No reservations yet</div>';
+      return;
+    }
+    $('reservations-table').innerHTML = `
+      <table>
+        <thead><tr><th>ID</th><th>Client ID</th><th>Slot ID</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody>${data.map(r => `
+          <tr>
+            <td class="mono">${esc(r.id?.substring(0,8))}…</td>
+            <td class="mono">${esc(r.clientId?.substring(0,8))}…</td>
+            <td class="mono">${esc(r.slotId?.substring(0,8))}…</td>
+            <td><span class="badge badge-${(r.status||'').toLowerCase()}">${esc(r.status)}</span></td>
+            <td>${fmtDate(r.createdAt)}</td>
+            <td><div class="actions">
+              ${r.status==='PENDING'?`
+                <button class="btn btn-success btn-sm" onclick='updateReservation("${r.id}","CONFIRMED")'>Confirm</button>
+                <button class="btn btn-danger btn-sm" onclick='updateReservation("${r.id}","CANCELLED")'>Cancel</button>
+              `:r.status==='CONFIRMED'?`
+                <button class="btn btn-danger btn-sm" onclick='updateReservation("${r.id}","CANCELLED")'>Cancel</button>
+              `:'<span style="font-size:12px;color:var(--color-text-tertiary)">Closed</span>'}
+            </div></td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } catch(e) {
+    $('reservations-table').innerHTML = '<div class="empty" style="color:var(--color-text-danger)"><i class="ti ti-alert-circle"></i>Failed to load</div>';
+  }
+}
+
+// PUT /api/reservations/{id} — update reservation status
+async function updateReservation(id, status) {
+  try {
+    const res = await fetch(`${API}/api/reservations/${id}`, {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: JSON.stringify({ status })
+    });
+    if (res.ok) {
+      showMsg('success', `Reservation ${status.toLowerCase()}.`);
+      loadReservations();
+    } else {
+      showMsg('error', `Failed to update reservation (HTTP ${res.status}).`);
+    }
+  } catch(e) {
+    showMsg('error', 'Could not update reservation.');
+  }
+}
+
+// ─── AUDIT LOGS ───────────────────────────────────────────────────────────────
+// GET /api/audit-logs  — ADMIN only, read-only
+async function loadAuditLogs() {
+  $('auditlogs-table').innerHTML = '<div class="empty"><i class="ti ti-loader"></i>Loading…</div>';
+  try {
+    const res = await fetch(`${API}/api/audit-logs`, { headers: authHeaders() });
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    if (!data.length) {
+      $('auditlogs-table').innerHTML = '<div class="empty"><i class="ti ti-history"></i>No audit logs yet</div>';
+      return;
+    }
+    $('auditlogs-table').innerHTML = `
+      <table>
+        <thead><tr><th>Entity</th><th>Entity ID</th><th>Action</th><th>Performed by</th><th>Timestamp</th></tr></thead>
+        <tbody>${data.slice().reverse().map(l => `
+          <tr>
+            <td style="font-weight:500">${esc(l.entityName)}</td>
+            <td class="mono">${esc(l.entityId?.substring(0,8))}…</td>
+            <td>${esc(l.action)}</td>
+            <td>${esc(l.performedBy || '—')}</td>
+            <td>${fmtDateTime(l.timestamp)}</td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } catch(e) {
+    $('auditlogs-table').innerHTML = '<div class="empty" style="color:var(--color-text-danger)"><i class="ti ti-alert-circle"></i>Failed to load</div>';
+  }
+}
+
+// ─── DELETE ───────────────────────────────────────────────────────────────────
+// DELETE /api/{endpoint}/{id}
+async function deleteItem(endpoint, id, label) {
+  if (!confirm(`Delete this ${label}? This cannot be undone.`)) return;
+  try {
+    const res = await fetch(`${API}/api/${endpoint}/${id}`, { method: 'DELETE', headers: authHeaders() });
+    if (res.ok || res.status === 204) {
+      showMsg('success', `${label.charAt(0).toUpperCase()+label.slice(1)} deleted.`);
+      loadSection(endpoint);
+    } else {
+      showMsg('error', `Delete failed (HTTP ${res.status}).`);
+    }
+  } catch(e) {
+    showMsg('error', 'Could not delete item.');
+  }
+}
+
+// ─── MODAL ────────────────────────────────────────────────────────────────────
+function closeModal() { $('modal').classList.add('hidden'); }
+
+function openModal(type, data) {
+  modalType = type;
+  modalData = data;
+  $('modal-title').textContent = data ? `Edit ${type}` : `New ${type}`;
+  $('modal-body').innerHTML = buildForm(type, data);
+  $('modal').classList.remove('hidden');
+  $('modal-save').disabled = false;
+  $('modal-spinner').classList.add('hidden');
+}
+
+function buildForm(type, d) {
+  switch(type) {
+
+    // ── Structure form ──────────────────────────────────────────────────────
+    // POST /api/structures  body: { name, description, address, phone, email, timezone }
+    // PUT  /api/structures/{id}
+    case 'structure': return `
+      <label>Name *</label>
+      <input id="f-name" value="${esc(d?.name||'')}">
+      <label>Description</label>
+      <textarea id="f-description">${esc(d?.description||'')}</textarea>
+      <label>Address *</label>
+      <input id="f-address" value="${esc(d?.address||'')}">
+      <div class="form-row">
+        <div><label>Phone * (e.g. +60123456789)</label><input id="f-phone" value="${esc(d?.phone||'')}"></div>
+        <div><label>Email *</label><input type="email" id="f-email" value="${esc(d?.email||'')}"></div>
+      </div>
+      <label>Timezone * (e.g. Asia/Kuala_Lumpur)</label>
+      <input id="f-timezone" value="${esc(d?.timezone||'')}">`;
+
+    // ── Service form ─────────────────────────────────────────────────────────
+    // POST /api/services  body: { structureId, name, description, timezone }
+    // PUT  /api/services/{id}
+    case 'service': return `
+      <label>Structure *</label>
+      <select id="f-structureId">
+        <option value="">— select structure —</option>
+        ${structures.map(s=>`<option value="${s.id}" ${d?.structureId===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}
+      </select>
+      <label>Service name *</label>
+      <input id="f-name" value="${esc(d?.name||'')}">
+      <label>Description</label>
+      <textarea id="f-description">${esc(d?.description||'')}</textarea>
+      <label>Timezone * (e.g. Asia/Kuala_Lumpur)</label>
+      <input id="f-timezone" value="${esc(d?.timezone||'')}">`;
+
+    // ── Slot form ────────────────────────────────────────────────────────────
+    // POST /api/slots  body: { serviceId, date, startTime, endTime, capacity }
+    // PUT  /api/slots/{id}  body: { date, startTime, endTime, capacity, available }
+    case 'slot': return `
+      ${!d ? `<label>Service *</label>
+      <select id="f-serviceId" style="margin-bottom:10px">
+        <option value="">— select service —</option>
+      </select>` : `<p style="font-size:12px;color:var(--color-text-secondary);margin-bottom:10px">Service: <strong>${esc(d.serviceId?.substring(0,8))}…</strong> (cannot change)</p>`}
+      <div class="form-row">
+        <div><label>Date *</label><input type="date" id="f-date" value="${esc(d?.date||'')}"></div>
+        <div><label>Capacity *</label><input type="number" id="f-capacity" min="1" value="${d?.capacity||1}"></div>
+      </div>
+      <div class="form-row">
+        <div><label>Start time *</label><input type="time" id="f-startTime" value="${esc(d?.startTime?.substring(0,5)||'')}"></div>
+        <div><label>End time *</label><input type="time" id="f-endTime" value="${esc(d?.endTime?.substring(0,5)||'')}"></div>
+      </div>
+      ${d ? `<label>Available spots</label><input type="number" id="f-available" min="0" value="${d?.available??d?.capacity}">` : ''}`;
+
+    // ── Client form ──────────────────────────────────────────────────────────
+    // POST /api/auth/register  body: { firstName, lastName, email, phone, password, roles }
+    // PUT  /api/clients/{id}
+    case 'client': return `
+      <div class="form-row">
+        <div><label>First name *</label><input id="f-firstName" value="${esc(d?.firstName||'')}"></div>
+        <div><label>Last name *</label><input id="f-lastName" value="${esc(d?.lastName||'')}"></div>
+      </div>
+      <label>Email *</label>
+      <input type="email" id="f-email" value="${esc(d?.email||'')}">
+      <label>Phone</label>
+      <input id="f-phone" value="${esc(d?.phone||'')}">
+      ${!d ? `<label>Password * (min 8 chars)</label><input type="password" id="f-password">` : ''}
+      <label>Role *</label>
+      <select id="f-role">
+        ${['CLIENT','STAFF','ADMIN'].map(r => {
+          const currentRoles = Array.isArray(d?.roles) ? d.roles.map(x => typeof x === 'string' ? x : String(x)) : [];
+          return `<option value="${r}" ${currentRoles.includes(r)?'selected':''}>${r}</option>`;
+        }).join('')}
+      </select>`;
+
+    default: return '<p>Unknown form type</p>';
+  }
+}
+
+// ─── SUBMIT MODAL ─────────────────────────────────────────────────────────────
+async function submitModal() {
+  setLoading('modal-spinner', 'modal-save', true);
+  try {
+    const result = await buildRequest(modalType, modalData);
+    if (!result) { setLoading('modal-spinner', 'modal-save', false); return; }
+    const { url, method, body } = result;
+
+    const res = await fetch(url, { method, headers: authHeaders(), body: JSON.stringify(body) });
+    if (res.ok || res.status === 201) {
+      showMsg('success', `${modalType.charAt(0).toUpperCase()+modalType.slice(1)} ${modalData?'updated':'created'} successfully.`);
+      closeModal();
+      // reload the relevant section
+      const sectionMap = { structure:'structures', service:'services', slot:'slots', client:'clients' };
+      loadSection(sectionMap[modalType] || modalType+'s');
+    } else {
+      const err = await res.json().catch(()=>({}));
+      showMsg('error', err.message || `Save failed (HTTP ${res.status}).`);
+    }
+  } catch(e) {
+    showMsg('error', 'Could not save. Check server logs.');
+  }
+  setLoading('modal-spinner', 'modal-save', false);
+}
+
+function val(id) { return $(id)?.value?.trim() || ''; }
+
+async function buildRequest(type, d) {
+  switch(type) {
+
+    case 'structure': {
+      const name = val('f-name'), address = val('f-address');
+      const phone = val('f-phone'), email = val('f-email'), timezone = val('f-timezone');
+      if (!name || !address || !phone || !email || !timezone) { showMsg('error','Fill in all required fields.'); return null; }
+      const body = { name, description: val('f-description'), address, phone, email, timezone };
+      return d
+        ? { url: `${API}/api/structures/${d.id}`, method: 'PUT', body }
+        : { url: `${API}/api/structures`,          method: 'POST', body };
+    }
+
+    case 'service': {
+      const structureId = val('f-structureId'), name = val('f-name'), timezone = val('f-timezone');
+      if (!name || !timezone) { showMsg('error','Fill in all required fields.'); return null; }
+      const body = { name, description: val('f-description'), timezone };
+      if (!d) {
+        if (!structureId) { showMsg('error','Select a structure.'); return null; }
+        body.structureId = structureId;
+        return { url: `${API}/api/services`, method: 'POST', body };
+      }
+      return { url: `${API}/api/services/${d.id}`, method: 'PUT', body };
+    }
+
+    case 'slot': {
+      const date = val('f-date'), startTime = val('f-startTime'), endTime = val('f-endTime');
+      const capacity = parseInt($('f-capacity')?.value) || 0;
+      if (!date || !startTime || !endTime || capacity < 1) { showMsg('error','Fill in all required fields.'); return null; }
+      if (!d) {
+        const serviceId = val('f-serviceId');
+        if (!serviceId) { showMsg('error','Select a service.'); return null; }
+        return { url: `${API}/api/slots`, method: 'POST', body: { serviceId, date, startTime, endTime, capacity } };
+      }
+      const available = parseInt($('f-available')?.value) ?? capacity;
+      return { url: `${API}/api/slots/${d.id}`, method: 'PUT', body: { date, startTime, endTime, capacity, available } };
+    }
+
+    case 'client': {
+      const firstName = val('f-firstName'), lastName = val('f-lastName');
+      const email = val('f-email'), phone = val('f-phone');
+      const role = val('f-role');
+      if (!firstName || !lastName || !email || !role) { showMsg('error','Fill in all required fields.'); return null; }
+      if (!d) {
+        // Create via /api/auth/register
+        const password = val('f-password');
+        if (!password || password.length < 8) { showMsg('error','Password must be at least 8 characters.'); return null; }
+        return { url: `${API}/api/auth/register`, method: 'POST', body: { firstName, lastName, email, phone, password, roles: [role] } };
+      }
+      // Update via /api/clients/{id} — UpdateClientRequest
+      return { url: `${API}/api/clients/${d.id}`, method: 'PUT', body: { firstName, lastName, email, phone, roles: new Set([role]) } };
+    }
+
+    default: return null;
+  }
+}
+
+// ─── SLOT MODAL — async populate service dropdown ─────────────────────────────
+// Override openModal to populate the service <select> after rendering
+const _openModal = openModal;
+window.openModal = async function(type, data) {
+  _openModal(type, data);
+  if (type === 'slot' && !data) {
+    // populate service dropdown after modal renders
+    try {
+      const res = await fetch(`${API}/api/services`, { headers: authHeaders() });
+      if (res.ok) {
+        const svcs = await res.json();
+        const sel = $('f-serviceId');
+        if (sel) {
+          sel.innerHTML = '<option value="">— select service —</option>' +
+            svcs.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+        }
+      }
+    } catch(e) {}
+  }
+};
+</script>
+</body>
+</html>
