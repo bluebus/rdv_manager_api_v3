@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RDV Manager</title>
+  <link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    :root {
+      --color-background-primary: #ffffff;
+      --color-background-secondary: #f5f5f4;
+      --color-background-tertiary: #f0ede8;
+      --color-background-info: #e6f1fb;
+      --color-background-success: #eaf3de;
+      --color-background-danger: #fcebeb;
+      --color-background-warning: #faeeda;
+      --color-text-primary: #1a1a19;
+      --color-text-secondary: #5f5e5a;
+      --color-text-tertiary: #888780;
+      --color-text-info: #0c447c;
+      --color-text-success: #27500a;
+      --color-text-danger: #791f1f;
+      --color-text-warning: #633806;
+      --color-border-tertiary: rgba(0,0,0,0.12);
+      --color-border-secondary: rgba(0,0,0,0.25);
+      --color-border-primary: rgba(0,0,0,0.35);
+      --color-border-info: #85b7eb;
+      --color-border-success: #97c459;
+      --color-border-danger: #f09595;
+      --color-border-warning: #ef9f27;
+      --font-sans: system-ui, -apple-system, sans-serif;
+      --border-radius-md: 8px;
+      --border-radius-lg: 12px;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --color-background-primary: #1e1e1c;
+        --color-background-secondary: #2a2a28;
+        --color-background-tertiary: #242422;
+        --color-background-info: #042c53;
+        --color-background-success: #173404;
+        --color-background-danger: #501313;
+        --color-background-warning: #412402;
+        --color-text-primary: #e8e6e0;
+        --color-text-secondary: #b4b2a9;
+        --color-text-tertiary: #888780;
+        --color-text-info: #85b7eb;
+        --color-text-success: #97c459;
+        --color-text-danger: #f09595;
+        --color-text-warning: #ef9f27;
+        --color-border-tertiary: rgba(255,255,255,0.1);
+        --color-border-secondary: rgba(255,255,255,0.2);
+        --color-border-primary: rgba(255,255,255,0.3);
+      }
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-background-tertiary);
+      min-height: 100vh;
+      padding: 2rem 1rem;
+      color: var(--color-text-primary);
+    }
+    .page { max-width: 640px; margin: 0 auto; }
+    .card {
+      background: var(--color-background-primary);
+      border: 0.5px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-lg);
+      padding: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    .hidden { display: none !important; }
+    h2 { font-size: 18px; font-weight: 500; margin-bottom: 1.25rem; }
+    h3 { font-size: 15px; font-weight: 500; margin-bottom: 0.75rem; }
+    label { display: block; font-size: 13px; color: var(--color-text-secondary); margin-bottom: 4px; }
+    input, select {
+      width: 100%;
+      margin-bottom: 1rem;
+      padding: 8px 10px;
+      font-size: 14px;
+      border: 0.5px solid var(--color-border-secondary);
+      border-radius: var(--border-radius-md);
+      background: var(--color-background-primary);
+      color: var(--color-text-primary);
+      outline: none;
+    }
+    input:focus, select:focus {
+      border-color: var(--color-border-primary);
+      box-shadow: 0 0 0 3px var(--color-border-tertiary);
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .btn {
+      width: 100%;
+      padding: 10px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: var(--border-radius-md);
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary {
+      background: var(--color-text-primary);
+      color: var(--color-background-primary);
+      border: none;
+    }
+    .btn-primary:hover:not(:disabled) { opacity: 0.85; }
+    .btn-secondary {
+      background: transparent;
+      color: var(--color-text-primary);
+      border: 0.5px solid var(--color-border-secondary);
+    }
+    .btn-secondary:hover:not(:disabled) { background: var(--color-background-secondary); }
+    .btn-sm { width: auto; padding: 6px 14px; font-size: 13px; }
+    .btn-danger {
+      background: transparent;
+      color: var(--color-text-danger);
+      border: 0.5px solid var(--color-border-danger);
+    }
+    .btn-danger:hover:not(:disabled) { background: var(--color-background-danger); }
+    .alert {
+      padding: 10px 14px;
+      border-radius: var(--border-radius-md);
+      font-size: 13px;
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    .alert-error   { background: var(--color-background-danger);  color: var(--color-text-danger);  border: 0.5px solid var(--color-border-danger); }
+    .alert-success { background: var(--color-background-success); color: var(--color-text-success); border: 0.5px solid var(--color-border-success); }
+    .alert-info    { background: var(--color-background-info);    color: var(--color-text-info);    border: 0.5px solid var(--color-border-info); }
+    .tabs {
+      display: flex;
+      border: 0.5px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-md);
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+    .tab {
+      flex: 1;
+      padding: 9px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--color-text-secondary);
+      transition: background 0.15s;
+    }
+    .tab.active {
+      background: var(--color-background-secondary);
+      color: var(--color-text-primary);
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1.5rem;
+      padding: 1rem 1.25rem;
+      background: var(--color-background-primary);
+      border: 0.5px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-lg);
+    }
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: var(--border-radius-md);
+      font-size: 12px;
+      font-weight: 500;
+      background: var(--color-background-info);
+      color: var(--color-text-info);
+    }
+    .slot-card {
+      border: 0.5px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-md);
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .slot-card:hover { border-color: var(--color-border-secondary); background: var(--color-background-secondary); }
+    .slot-card.selected { border-color: var(--color-border-info); background: var(--color-background-info); }
+    .booking-card {
+      border: 0.5px solid var(--color-border-tertiary);
+      border-radius: var(--border-radius-md);
+      padding: 12px 14px;
+      margin-bottom: 10px;
+    }
+    .booking-status {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: var(--border-radius-md);
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .status-PENDING   { background: #faeeda; color: #633806; }
+    .status-CONFIRMED { background: #eaf3de; color: #27500a; }
+    .status-CANCELLED { background: #fcebeb; color: #791f1f; }
+    .field-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      padding: 6px 0;
+      border-bottom: 0.5px solid var(--color-border-tertiary);
+    }
+    .field-row:last-child { border-bottom: none; }
+    .field-label { color: var(--color-text-secondary); }
+    .spinner {
+      display: inline-block;
+      width: 14px;
+      height: 14px;
+      border: 2px solid currentColor;
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      vertical-align: -2px;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .step-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 1.25rem;
+      font-size: 13px;
+      color: var(--color-text-secondary);
+    }
+    .step-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--color-border-secondary);
+      flex-shrink: 0;
+      transition: background 0.2s;
+    }
+    .step-dot.active { background: var(--color-text-primary); }
+    .step-dot.done   { background: var(--color-text-success); }
+    .divider {
+      border: none;
+      border-top: 0.5px solid var(--color-border-tertiary);
+      margin: 1rem 0;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 2rem 0;
+      color: var(--color-text-tertiary);
+      font-size: 13px;
+    }
+    .empty-state i { font-size: 32px; display: block; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ─── AUTH SECTION ─── -->
+  <div id="auth-section">
+    <div style="margin-bottom:1.5rem;text-align:center">
+      <p style="font-size:24px;font-weight:500">RDV Manager</p>
+      <p style="font-size:13px;color:var(--color-text-secondary);margin-top:4px">Appointment booking portal</p>
+    </div>
+
+    <div class="tabs" id="auth-tabs">
+      <button class="tab active" onclick="switchTab('login')">
+        <i class="ti ti-lock" style="font-size:14px;vertical-align:-1px;margin-right:4px"></i>Sign in
+      </button>
+      <button class="tab" onclick="switchTab('register')">
+        <i class="ti ti-user-plus" style="font-size:14px;vertical-align:-1px;margin-right:4px"></i>Register
+      </button>
+    </div>
+
+    <div id="auth-msg"></div>
+
+    <!-- LOGIN FORM -->
+    <div id="login-form" class="card">
+      <h2>Sign in to your account</h2>
+      <label for="login-email">Email address</label>
+      <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email">
+      <label for="login-password">Password</label>
+      <input type="password" id="login-password" placeholder="••••••••" autocomplete="current-password"
+        onkeydown="if(event.key==='Enter') doLogin()">
+      <button class="btn btn-primary" onclick="doLogin()" id="login-btn">
+        <span id="login-spinner" class="spinner hidden"></span>Sign in
+      </button>
+      <hr class="divider">
+      <p style="font-size:13px;color:var(--color-text-secondary);text-align:center">
+        No account?
+        <a href="#" onclick="switchTab('register');return false"
+          style="color:var(--color-text-info);text-decoration:none">Register here</a>
+      </p>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="register-form" class="card hidden">
+      <h2>Create your account</h2>
+      <div class="row">
+        <div>
+          <label for="reg-first">First name</label>
+          <input type="text" id="reg-first" placeholder="Jane" autocomplete="given-name">
+        </div>
+        <div>
+          <label for="reg-last">Last name</label>
+          <input type="text" id="reg-last" placeholder="Doe" autocomplete="family-name">
+        </div>
+      </div>
+      <label for="reg-email">Email address</label>
+      <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email">
+      <label for="reg-phone">Phone number</label>
+      <input type="tel" id="reg-phone" placeholder="+60123456789" autocomplete="tel">
+      <label for="reg-password">
+        Password <span style="color:var(--color-text-tertiary);font-size:12px">(min 8 characters)</span>
+      </label>
+      <input type="password" id="reg-password" placeholder="••••••••" autocomplete="new-password"
+        onkeydown="if(event.key==='Enter') doRegister()">
+      <button class="btn btn-primary" onclick="doRegister()" id="reg-btn">
+        <span id="reg-spinner" class="spinner hidden"></span>Create account
+      </button>
+      <hr class="divider">
+      <p style="font-size:13px;color:var(--color-text-secondary);text-align:center">
+        Already registered?
+        <a href="#" onclick="switchTab('login');return false"
+          style="color:var(--color-text-info);text-decoration:none">Sign in</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- ─── APP SECTION (shown after login) ─── -->
+  <div id="app-section" class="hidden">
+
+    <!-- NAV BAR -->
+    <div class="nav">
+      <div>
+        <p style="font-size:16px;font-weight:500">RDV Manager</p>
+        <p style="font-size:12px;color:var(--color-text-secondary);margin-top:2px" id="nav-email"></p>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="badge" id="nav-role"></span>
+        <button class="btn btn-secondary btn-sm" onclick="doLogout()">
+          <i class="ti ti-logout" style="font-size:14px;vertical-align:-1px;margin-right:4px"></i>Sign out
+        </button>
+      </div>
+    </div>
+
+    <!-- APP TABS -->
+    <div class="tabs">
+      <button class="tab active" id="tab-book" onclick="showView('booking')">
+        <i class="ti ti-calendar-plus" style="font-size:14px;vertical-align:-1px;margin-right:4px"></i>Book appointment
+      </button>
+      <button class="tab" id="tab-my" onclick="showView('mybookings')">
+        <i class="ti ti-calendar-check" style="font-size:14px;vertical-align:-1px;margin-right:4px"></i>My bookings
+      </button>
+    </div>
+
+    <!-- GLOBAL APP MESSAGE -->
+    <div id="app-msg"></div>
+
+    <!-- ─── BOOKING VIEW ─── -->
+    <div id="view-booking">
+      <div class="step-bar">
+        <div class="step-dot active" id="dot1"></div>
+        <div class="step-dot" id="dot2"></div>
+        <div class="step-dot" id="dot3"></div>
+        <span id="step-label">Step 1 — choose a service</span>
+      </div>
+
+      <!-- STEP 1: Services -->
+      <div id="step1">
+        <div class="card">
+          <h3>
+            <i class="ti ti-building-community" style="font-size:15px;vertical-align:-2px;margin-right:6px"></i>
+            Available services
+          </h3>
+          <div id="services-list">
+            <div class="empty-state">
+              <i class="ti ti-loader"></i>Loading services…
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Slots -->
+      <div id="step2" class="hidden">
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem">
+            <h3 style="margin-bottom:0">
+              <i class="ti ti-clock" style="font-size:15px;vertical-align:-2px;margin-right:6px"></i>
+              Available slots
+            </h3>
+            <span id="step2-service-name"
+              style="font-size:12px;color:var(--color-text-secondary);background:var(--color-background-secondary);
+              padding:3px 10px;border-radius:var(--border-radius-md)"></span>
+          </div>
+          <div id="slots-list">
+            <div class="empty-state">
+              <i class="ti ti-loader"></i>Loading slots…
+            </div>
+          </div>
+          <button class="btn btn-secondary" style="margin-top:12px" onclick="goStep(1)">
+            <i class="ti ti-arrow-left" style="font-size:14px;vertical-align:-1px;margin-right:4px"></i>Back
+          </button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Confirm -->
+      <div id="step3" class="hidden">
+        <div class="card">
+          <h3>
+            <i class="ti ti-clipboard-check" style="font-size:15px;vertical-align:-2px;margin-right:6px"></i>
+            Confirm your booking
+          </h3>
+          <div id="confirm-details" style="margin-bottom:1.25rem"></div>
+          <button class="btn btn-primary" onclick="doBook()" id="book-btn">
+            <span id="book-spinner" class="spinner hidden"></span>Confirm booking
+          </button>
+          <button class="btn btn-secondary" style="margin-top:8px" onclick="goStep(2)">
+            <i class="ti ti-arrow-left" style="font-size:14px;vertical-align:-1px;margin-right:4px"></i>Back
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ─── MY BOOKINGS VIEW ─── -->
+    <div id="view-mybookings" class="hidden">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem">
+          <h3 style="margin-bottom:0">
+            <i class="ti ti-list-check" style="font-size:15px;vertical-align:-2px;margin-right:6px"></i>
+            Your reservations
+          </h3>
+          <button class="btn btn-secondary btn-sm" onclick="loadMyBookings()">
+            <i class="ti ti-refresh" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>Refresh
+          </button>
+        </div>
+        <div id="bookings-list">
+          <div class="empty-state">
+            <i class="ti ti-loader"></i>Loading…
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ─── CONFIG ───────────────────────────────────────────────────
+  // Empty string = same origin (Spring Boot serves both frontend and API)
+  // Change to 'http://localhost:8080' if running frontend separately
+  const API = '';
+
+  // ─── STATE ────────────────────────────────────────────────────
+  let token = null;
+  let currentUser = null;
+  let selectedService = null;
+  let selectedSlot = null;
+
+  // ─── HELPERS ──────────────────────────────────────────────────
+  const $ = id => document.getElementById(id);
+
+  function showMsg(elId, type, text) {
+    const el = $(elId);
+    el.innerHTML = `<div class="alert alert-${type}">${text}</div>`;
+    if (type !== 'error') setTimeout(() => { el.innerHTML = ''; }, 5000);
+  }
+
+  function clearMsg(elId) { $(elId).innerHTML = ''; }
+
+  function setLoading(spinnerId, btnId, loading) {
+    $(spinnerId).classList.toggle('hidden', !loading);
+    $(btnId).disabled = loading;
+  }
+
+  function authHeaders() {
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+  }
+
+  // ─── AUTH TAB SWITCH ──────────────────────────────────────────
+  function switchTab(tab) {
+    $('login-form').classList.toggle('hidden', tab !== 'login');
+    $('register-form').classList.toggle('hidden', tab !== 'register');
+    $('auth-tabs').querySelectorAll('.tab').forEach((t, i) => {
+      t.classList.toggle('active', (i === 0 && tab === 'login') || (i === 1 && tab === 'register'));
+    });
+    clearMsg('auth-msg');
+  }
+
+  // ─── REGISTER ─────────────────────────────────────────────────
+  // Calls: POST /api/auth/register
+  // Body:  { firstName, lastName, email, phone, password, roles: ["CLIENT"] }
+  // On success → switches to login tab with email pre-filled
+  async function doRegister() {
+    const first = $('reg-first').value.trim();
+    const last  = $('reg-last').value.trim();
+    const email = $('reg-email').value.trim();
+    const phone = $('reg-phone').value.trim();
+    const pass  = $('reg-password').value;
+
+    if (!first || !last || !email || !pass) {
+      return showMsg('auth-msg', 'error', 'Please fill in all required fields.');
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return showMsg('auth-msg', 'error', 'Please enter a valid email address.');
+    }
+    if (pass.length < 8) {
+      return showMsg('auth-msg', 'error', 'Password must be at least 8 characters.');
+    }
+
+    setLoading('reg-spinner', 'reg-btn', true);
+    try {
+      const res = await fetch(`${API}/api/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ firstName: first, lastName: last, email, phone, password: pass, roles: ['CLIENT'] })
+      });
+      if (res.ok) {
+        showMsg('auth-msg', 'success', 'Account created successfully. You can now sign in.');
+        switchTab('login');
+        $('login-email').value = email;
+        $('login-password').focus();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        showMsg('auth-msg', 'error', err.message || `Registration failed (HTTP ${res.status}). Check server logs.`);
+      }
+    } catch (e) {
+      showMsg('auth-msg', 'error', 'Cannot reach the server. Make sure the API is running.');
+    }
+    setLoading('reg-spinner', 'reg-btn', false);
+  }
+
+  // ─── LOGIN ────────────────────────────────────────────────────
+  // Calls: POST /api/auth/login
+  // Body:  { email, password }
+  // On success → stores JWT token + user info → enters app
+  async function doLogin() {
+    const email = $('login-email').value.trim();
+    const pass  = $('login-password').value;
+
+    if (!email || !pass) {
+      return showMsg('auth-msg', 'error', 'Please enter your email and password.');
+    }
+
+    setLoading('login-spinner', 'login-btn', true);
+    try {
+      const res = await fetch(`${API}/api/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password: pass })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        // Store token and user info in memory (never in localStorage for security)
+        token = data.token;
+        currentUser = data;
+        enterApp();
+      } else if (res.status === 401) {
+        showMsg('auth-msg', 'error', 'Incorrect email or password. Please try again.');
+      } else {
+        showMsg('auth-msg', 'error', `Login failed (HTTP ${res.status}). Check server logs.`);
+      }
+    } catch (e) {
+      showMsg('auth-msg', 'error', 'Cannot reach the server. Make sure the API is running.');
+    }
+    setLoading('login-spinner', 'login-btn', false);
+  }
+
+  // ─── ENTER APP ────────────────────────────────────────────────
+  function enterApp() {
+    $('auth-section').classList.add('hidden');
+    $('app-section').classList.remove('hidden');
+    $('nav-email').textContent = currentUser.email;
+    $('nav-role').textContent  = (currentUser.roles || ['CLIENT'])[0];
+    showView('booking');
+    loadServices();
+  }
+
+  // ─── LOGOUT ───────────────────────────────────────────────────
+  function doLogout() {
+    token = null; currentUser = null;
+    selectedService = null; selectedSlot = null;
+    $('auth-section').classList.remove('hidden');
+    $('app-section').classList.add('hidden');
+    $('login-password').value = '';
+    clearMsg('auth-msg');
+    switchTab('login');
+  }
+
+  // ─── VIEW SWITCHER ────────────────────────────────────────────
+  function showView(v) {
+    $('view-booking').classList.toggle('hidden', v !== 'booking');
+    $('view-mybookings').classList.toggle('hidden', v !== 'mybookings');
+    $('tab-book').classList.toggle('active', v === 'booking');
+    $('tab-my').classList.toggle('active',  v === 'mybookings');
+    clearMsg('app-msg');
+    if (v === 'mybookings') loadMyBookings();
+  }
+
+  // ─── STEP NAVIGATION ──────────────────────────────────────────
+  function goStep(n) {
+    [1, 2, 3].forEach(i => {
+      $(`step${i}`).classList.toggle('hidden', i !== n);
+    });
+    const dots  = [$('dot1'), $('dot2'), $('dot3')];
+    const labels = [
+      'Step 1 — choose a service',
+      'Step 2 — choose an available slot',
+      'Step 3 — review and confirm'
+    ];
+    dots.forEach((d, i) => {
+      d.classList.toggle('active', i + 1 === n);
+      d.classList.toggle('done',   i + 1 < n);
+    });
+    $('step-label').textContent = labels[n - 1];
+  }
+
+  // ─── LOAD SERVICES ────────────────────────────────────────────
+  // Calls: GET /api/services
+  // Requires: Bearer token in Authorization header
+  // Displays each service as a clickable card
+  async function loadServices() {
+    goStep(1);
+    $('services-list').innerHTML = '<div class="empty-state"><i class="ti ti-loader"></i>Loading services…</div>';
+    try {
+      const res = await fetch(`${API}/api/services`, { headers: authHeaders() });
+      if (res.status === 401) { doLogout(); return; }
+      if (!res.ok) throw new Error(res.status);
+
+      const services = await res.json();
+      if (!services.length) {
+        $('services-list').innerHTML = '<div class="empty-state"><i class="ti ti-mood-empty"></i>No services available at the moment.</div>';
+        return;
+      }
+      $('services-list').innerHTML = services.map(s => `
+        <div class="slot-card" onclick='selectService(${JSON.stringify(s)})'>
+          <div>
+            <p style="font-size:14px;font-weight:500;margin-bottom:3px">${escHtml(s.name)}</p>
+            <p style="font-size:12px;color:var(--color-text-secondary)">
+              ${escHtml(s.description || 'No description')}
+              ${s.timezone ? `&nbsp;·&nbsp;<i class="ti ti-clock" style="font-size:12px;vertical-align:-1px"></i> ${escHtml(s.timezone)}` : ''}
+            </p>
+          </div>
+          <i class="ti ti-arrow-right" style="font-size:18px;color:var(--color-text-tertiary)"></i>
+        </div>`).join('');
+    } catch (e) {
+      $('services-list').innerHTML = '<div class="empty-state" style="color:var(--color-text-danger)"><i class="ti ti-alert-circle"></i>Failed to load services. Check your connection.</div>';
+    }
+  }
+
+  // ─── SELECT SERVICE → LOAD SLOTS ──────────────────────────────
+  // Calls: GET /api/slots (then filters by serviceId client-side)
+  // Only shows slots where available > 0
+  async function selectService(s) {
+    selectedService = s;
+    $('step2-service-name').textContent = s.name;
+    goStep(2);
+    $('slots-list').innerHTML = '<div class="empty-state"><i class="ti ti-loader"></i>Loading slots…</div>';
+    try {
+      const res = await fetch(`${API}/api/slots`, { headers: authHeaders() });
+      if (res.status === 401) { doLogout(); return; }
+      if (!res.ok) throw new Error(res.status);
+
+      const allSlots = await res.json();
+      // Filter to this service's slots with remaining capacity
+      const slots = allSlots.filter(sl => sl.serviceId === s.id && sl.available > 0);
+
+      if (!slots.length) {
+        $('slots-list').innerHTML = '<div class="empty-state"><i class="ti ti-calendar-off"></i>No available slots for this service.</div>';
+        return;
+      }
+      $('slots-list').innerHTML = slots.map(sl => `
+        <div class="slot-card" onclick='selectSlot(${JSON.stringify(sl)})'>
+          <div>
+            <p style="font-size:14px;font-weight:500;margin-bottom:3px">
+              <i class="ti ti-calendar" style="font-size:13px;vertical-align:-1px;margin-right:4px"></i>${escHtml(sl.date)}
+            </p>
+            <p style="font-size:12px;color:var(--color-text-secondary)">
+              <i class="ti ti-clock" style="font-size:12px;vertical-align:-1px;margin-right:3px"></i>
+              ${escHtml(sl.startTime)} – ${escHtml(sl.endTime)}
+            </p>
+          </div>
+          <div style="text-align:right">
+            <p style="font-size:13px;font-weight:500;color:var(--color-text-success)">${sl.available} spot${sl.available !== 1 ? 's' : ''} left</p>
+            <p style="font-size:11px;color:var(--color-text-tertiary)">${sl.capacity} total</p>
+          </div>
+        </div>`).join('');
+    } catch (e) {
+      $('slots-list').innerHTML = '<div class="empty-state" style="color:var(--color-text-danger)"><i class="ti ti-alert-circle"></i>Failed to load slots.</div>';
+    }
+  }
+
+  // ─── SELECT SLOT → CONFIRM SCREEN ─────────────────────────────
+  function selectSlot(sl) {
+    selectedSlot = sl;
+    goStep(3);
+    $('confirm-details').innerHTML = `
+      <div class="field-row"><span class="field-label">Service</span><span style="font-weight:500">${escHtml(selectedService.name)}</span></div>
+      <div class="field-row"><span class="field-label">Date</span><span>${escHtml(sl.date)}</span></div>
+      <div class="field-row"><span class="field-label">Time</span><span>${escHtml(sl.startTime)} – ${escHtml(sl.endTime)}</span></div>
+      <div class="field-row"><span class="field-label">Spots available</span>
+        <span style="color:var(--color-text-success);font-weight:500">${sl.available} of ${sl.capacity}</span>
+      </div>
+      <div class="field-row"><span class="field-label">Booked for</span><span style="color:var(--color-text-secondary)">${escHtml(currentUser.email)}</span></div>`;
+  }
+
+  // ─── CONFIRM BOOKING ──────────────────────────────────────────
+  // Calls: POST /api/reservations
+  // Body:  { clientId, slotId }
+  // Note:  clientId comes from AuthResponse — add 'id' field to AuthResponse.java if missing
+  async function doBook() {
+    setLoading('book-spinner', 'book-btn', true);
+    try {
+      const res = await fetch(`${API}/api/reservations`, {
+        method: 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({
+          clientId: currentUser.id,   // requires 'id' field in AuthResponse.java
+          slotId: selectedSlot.id
+        })
+      });
+      if (res.ok) {
+        showMsg('app-msg', 'success',
+          '<i class="ti ti-circle-check" style="vertical-align:-2px;margin-right:6px"></i>' +
+          'Booking confirmed! View it in the My bookings tab.');
+        goStep(1);
+        loadServices();
+      } else if (res.status === 401) {
+        doLogout();
+      } else {
+        const err = await res.json().catch(() => ({}));
+        showMsg('app-msg', 'error', err.message || `Booking failed (HTTP ${res.status}).`);
+      }
+    } catch (e) {
+      showMsg('app-msg', 'error', 'Could not complete booking. Please try again.');
+    }
+    setLoading('book-spinner', 'book-btn', false);
+  }
+
+  // ─── LOAD MY BOOKINGS ─────────────────────────────────────────
+  // Calls: GET /api/reservations
+  // Shows each reservation with status badge and slot details
+  async function loadMyBookings() {
+    $('bookings-list').innerHTML = '<div class="empty-state"><i class="ti ti-loader"></i>Loading…</div>';
+    try {
+      const res = await fetch(`${API}/api/reservations`, { headers: authHeaders() });
+      if (res.status === 401) { doLogout(); return; }
+      if (!res.ok) throw new Error(res.status);
+
+      const bookings = await res.json();
+      if (!bookings.length) {
+        $('bookings-list').innerHTML = `
+          <div class="empty-state">
+            <i class="ti ti-calendar-off"></i>
+            No bookings yet.<br>
+            <a href="#" onclick="showView('booking');return false"
+              style="color:var(--color-text-info);text-decoration:none;font-size:13px">
+              Make your first booking →
+            </a>
+          </div>`;
+        return;
+      }
+      $('bookings-list').innerHTML = bookings.map(b => `
+        <div class="booking-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+            <span style="font-size:13px;font-weight:500;color:var(--color-text-secondary)">
+              <i class="ti ti-ticket" style="font-size:14px;vertical-align:-2px;margin-right:4px"></i>
+              Reservation
+            </span>
+            <span class="booking-status status-${b.status}">${b.status}</span>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Reservation ID</span>
+            <span style="font-size:11px;color:var(--color-text-tertiary);font-family:monospace">${b.id}</span>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Slot ID</span>
+            <span style="font-size:11px;color:var(--color-text-tertiary);font-family:monospace">${b.slotId}</span>
+          </div>
+          <div class="field-row">
+            <span class="field-label">Created</span>
+            <span>${new Date(b.createdAt).toLocaleString()}</span>
+          </div>
+        </div>`).join('');
+    } catch (e) {
+      $('bookings-list').innerHTML = '<div class="empty-state" style="color:var(--color-text-danger)"><i class="ti ti-alert-circle"></i>Failed to load bookings.</div>';
+    }
+  }
+
+  // ─── XSS PROTECTION ───────────────────────────────────────────
+  // Escapes any data coming from the API before inserting into innerHTML
+  function escHtml(str) {
+    if (str == null) return '';
+    return String(str)
+      .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>

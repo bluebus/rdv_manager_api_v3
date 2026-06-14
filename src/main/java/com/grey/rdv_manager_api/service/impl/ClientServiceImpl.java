@@ -4,6 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+//202606 add to initialize class PasswordEncoder"
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.grey.rdv_manager_api.domain.model.Client;
 import com.grey.rdv_manager_api.mapper.ClientMapper;
 import com.grey.rdv_manager_api.payload.request.CreateClientRequest;
@@ -15,6 +18,7 @@ import com.grey.rdv_manager_api.service.ClientService;
 import java.util.List;
 import java.util.UUID;
 
+
 @Service
 @RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
@@ -22,11 +26,20 @@ public class ClientServiceImpl implements ClientService {
     private final ClientRepository repository;
     private final ClientMapper mapper;
 
+    //add this part for password encoder
+    private final PasswordEncoder passwordEncoder;
+    //end new part
+
     @Override
     @Transactional
     public ClientResponse create(CreateClientRequest request) {
-        Client entity = mapper.toEntity(request);
+        Client entity = mapper.toEntity(request);        
         entity.setId(UUID.randomUUID());
+
+        //202606 add this part to encode password
+        entity.setPasswordHash(passwordEncoder.encode(request.password())); 
+        //end new part
+
         Client saved = repository.save(entity);
         return mapper.toResponse(saved);
     }

@@ -22,3 +22,9 @@ logging:
     root: INFO
     org.springframework.web: DEBUG
     com.grey.sytsas: DEBUG
+#line before here is origin config
+
+app: # 202606 added for JWT config
+  jwt:
+    secret: your-256-bit-base64-encoded-secret-key-here   # min 32 chars
+    expiration-ms: 86400000   # 24 hours
