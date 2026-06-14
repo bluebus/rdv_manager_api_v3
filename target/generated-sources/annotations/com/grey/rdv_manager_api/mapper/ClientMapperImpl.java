@@ -8,14 +8,13 @@ import com.grey.rdv_manager_api.payload.response.ClientResponse;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
 import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-06-14T18:13:40+0800",
+    date = "2026-06-14T18:27:10+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 17.0.19 (Eclipse Adoptium)"
 )
 @Component
@@ -58,19 +57,8 @@ public class ClientMapperImpl implements ClientMapper {
         if ( dto.phone() != null ) {
             entity.setPhone( dto.phone() );
         }
-        if ( entity.getRoles() != null ) {
-            List<Role> list = stringSetToRoleList( dto.roles() );
-            if ( list != null ) {
-                entity.getRoles().clear();
-                entity.getRoles().addAll( list );
-            }
-        }
-        else {
-            List<Role> list = stringSetToRoleList( dto.roles() );
-            if ( list != null ) {
-                entity.setRoles( list );
-            }
-        }
+
+        entity.setRoles( dto.roles() == null ? null : dto.roles().stream().map(r -> com.grey.rdv_manager_api.domain.enums.Role.valueOf(r.toUpperCase())).collect(java.util.stream.Collectors.toList()) );
 
         return entity;
     }
@@ -118,19 +106,6 @@ public class ClientMapperImpl implements ClientMapper {
         List<ClientResponse> list = new ArrayList<ClientResponse>( entities.size() );
         for ( Client client : entities ) {
             list.add( toResponse( client ) );
-        }
-
-        return list;
-    }
-
-    protected List<Role> stringSetToRoleList(Set<String> set) {
-        if ( set == null ) {
-            return null;
-        }
-
-        List<Role> list = new ArrayList<Role>( set.size() );
-        for ( String string : set ) {
-            list.add( Enum.valueOf( Role.class, string ) );
         }
 
         return list;

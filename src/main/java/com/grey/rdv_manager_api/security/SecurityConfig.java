@@ -73,6 +73,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/structures/**").hasRole("ADMIN")
 
                 // ADMIN + STAFF — service and availability management
+                .requestMatchers(HttpMethod.GET, "/api/services/**").authenticated()
                 .requestMatchers("/api/services/**").hasAnyRole("ADMIN", "STAFF")
                 .requestMatchers("/api/service-availabilities/**").hasAnyRole("ADMIN", "STAFF")
 
