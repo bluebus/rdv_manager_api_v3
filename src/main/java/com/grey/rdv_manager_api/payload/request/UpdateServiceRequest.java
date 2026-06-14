@@ -12,12 +12,6 @@ public record UpdateServiceRequest(
     String name,
 
     @Size(max = 500, message = "Description must not exceed 500 characters")
-    String description,
-
-    @Pattern(
-        regexp = "^([A-Za-z]+/[A-Za-z_]+)?$",
-        message = "Timezone must be in Region/City format, e.g. Asia/Kuala_Lumpur"
-    )
-    String timezone
+    String description
 ) {}
 

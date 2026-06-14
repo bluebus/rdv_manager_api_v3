@@ -1,20 +1,23 @@
 package com.grey.rdv_manager_api;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.core.Ordered;
+import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import java.util.Collections;
 //202606 add to intialize variable List
 import java.util.List;
 
 @SpringBootApplication(scanBasePackages = "com.grey.rdv_manager_api")
 @EnableMongoRepositories
+@EnableMongoAuditing 
+
 public class RdvManagerApi {
     public static void main(String[] args) {
         SpringApplication.run(RdvManagerApi.class, args);

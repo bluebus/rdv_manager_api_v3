@@ -27,11 +27,5 @@ public record UpdateStructureRequest(
     String phone,
 
     @Email(message = "Email must be a valid email address")
-    String email,
-
-    @Pattern(
-        regexp = "^([A-Za-z]+/[A-Za-z_]+)?$",
-        message = "Timezone must be in Region/City format, e.g. Asia/Kuala_Lumpur"
-    )
-    String timezone
+    String email
 ) {}

@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-06-14T20:08:37+0800",
+    date = "2026-06-14T21:02:48+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 17.0.19 (Eclipse Adoptium)"
 )
 @Component
@@ -30,7 +30,6 @@ public class ServiceEntityMapperImpl implements ServiceEntityMapper {
         serviceEntity.structureId( dto.structureId() );
         serviceEntity.name( dto.name() );
         serviceEntity.description( dto.description() );
-        serviceEntity.timezone( dto.timezone() );
 
         return serviceEntity.build();
     }
@@ -46,9 +45,6 @@ public class ServiceEntityMapperImpl implements ServiceEntityMapper {
         }
         if ( dto.description() != null ) {
             entity.setDescription( dto.description() );
-        }
-        if ( dto.timezone() != null ) {
-            entity.setTimezone( dto.timezone() );
         }
 
         return entity;

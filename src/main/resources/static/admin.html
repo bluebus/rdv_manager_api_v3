@@ -365,8 +365,26 @@ function authHeaders() {
   return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
 }
 
-function fmtDate(s) { return s ? new Date(s).toLocaleDateString() : '—'; }
-function fmtDateTime(s) { return s ? new Date(s).toLocaleString() : '—'; }
+function parseSpringDate(val) {
+  if (!val) return null;
+  // Array: [year, month, day, hour, min, sec]
+  if (Array.isArray(val)) {
+    const [year, month, day, hour = 0, min = 0, sec = 0] = val;
+    return new Date(year, month - 1, day, hour, min, sec);
+  }
+  // ISO string
+  return new Date(val);
+}
+
+function fmtDate(s) {
+  const d = parseSpringDate(s);
+  return d ? d.toLocaleDateString() : '—';
+}
+
+function fmtDateTime(s) {
+  const d = parseSpringDate(s);
+  return d ? d.toLocaleString() : '—';
+}
 
 function setLoading(spinnerId, btnId, on) {
   $(spinnerId).classList.toggle('hidden', !on);
@@ -396,6 +414,8 @@ async function doLogin() {
       }
       token = data.token;
       currentAdmin = data;
+      sessionStorage.setItem('rdv_token', data.token);
+      sessionStorage.setItem('rdv_user', JSON.stringify(data));
       $('login-screen').classList.add('hidden');
       $('admin-app').classList.remove('hidden');
       $('topbar-user').textContent = data.email;
@@ -417,6 +437,8 @@ function showLoginMsg(type, text) {
 
 function doLogout() {
   token = null; currentAdmin = null;
+  sessionStorage.removeItem('rdv_token');
+  sessionStorage.removeItem('rdv_user');
   $('admin-app').classList.add('hidden');
   $('login-screen').classList.remove('hidden');
   $('login-password').value = '';
@@ -778,7 +800,6 @@ function buildForm(type, d) {
         <div><label>Phone * (e.g. +60123456789)</label><input id="f-phone" value="${esc(d?.phone||'')}"></div>
         <div><label>Email *</label><input type="email" id="f-email" value="${esc(d?.email||'')}"></div>
       </div>
-      <label>Timezone * (e.g. Asia/Kuala_Lumpur)</label>
       <input id="f-timezone" value="${esc(d?.timezone||'')}">`;
 
     // ── Service form ─────────────────────────────────────────────────────────
@@ -794,7 +815,6 @@ function buildForm(type, d) {
       <input id="f-name" value="${esc(d?.name||'')}">
       <label>Description</label>
       <textarea id="f-description">${esc(d?.description||'')}</textarea>
-      <label>Timezone * (e.g. Asia/Kuala_Lumpur)</label>
       <input id="f-timezone" value="${esc(d?.timezone||'')}">`;
 
     // ── Slot form ────────────────────────────────────────────────────────────
@@ -874,7 +894,7 @@ async function buildRequest(type, d) {
       const name = val('f-name'), address = val('f-address');
       const phone = val('f-phone'), email = val('f-email'), timezone = val('f-timezone');
       if (!name || !address || !phone || !email || !timezone) { showMsg('error','Fill in all required fields.'); return null; }
-      const body = { name, description: val('f-description'), address, phone, email, timezone };
+      const body = { name, description: val('f-description'), address, phone, email };
       return d
         ? { url: `${API}/api/structures/${d.id}`, method: 'PUT', body }
         : { url: `${API}/api/structures`,          method: 'POST', body };
@@ -883,7 +903,7 @@ async function buildRequest(type, d) {
     case 'service': {
       const structureId = val('f-structureId'), name = val('f-name'), timezone = val('f-timezone');
       if (!name || !timezone) { showMsg('error','Fill in all required fields.'); return null; }
-      const body = { name, description: val('f-description'), timezone };
+      const body = { name, description: val('f-description') };
       if (!d) {
         if (!structureId) { showMsg('error','Select a structure.'); return null; }
         body.structureId = structureId;
@@ -944,6 +964,29 @@ window.openModal = async function(type, data) {
     } catch(e) {}
   }
 };
+
+// ─── RESTORE SESSION ON PAGE LOAD ─────────────────────────────
+(function restoreSession() {
+  const savedToken = sessionStorage.getItem('rdv_token');
+  const savedUser  = sessionStorage.getItem('rdv_user');
+  if (savedToken && savedUser) {
+    try {
+      const data = JSON.parse(savedUser);
+      const roles = (data.roles || []).map(r => typeof r === 'string' ? r : r.toString());
+      if (!roles.includes('ADMIN')) return; // safety check
+      token = savedToken;
+      currentAdmin = data;
+      $('login-screen').classList.add('hidden');
+      $('admin-app').classList.remove('hidden');
+      $('topbar-user').textContent = data.email;
+      showSection('dashboard');
+    } catch(e) {
+      sessionStorage.removeItem('rdv_token');
+      sessionStorage.removeItem('rdv_user');
+    }
+  }
+})();
+
 </script>
 </body>
 </html>

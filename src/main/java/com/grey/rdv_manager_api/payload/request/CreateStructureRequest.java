@@ -34,13 +34,5 @@ public record CreateStructureRequest(
 
         @NotBlank(message = "Email is required")
         @Email(message = "Email must be a valid email address")
-        String email,
-
-        // Validates Region/City format e.g. Asia/Kuala_Lumpur
-        @NotBlank(message = "Timezone is required")
-        @Pattern(
-                regexp = "^[A-Za-z]+/[A-Za-z_]+$",
-                message = "Timezone must be in Region/City format, e.g. Asia/Kuala_Lumpur"
-        )
-        String timezone
+        String email
         ){}

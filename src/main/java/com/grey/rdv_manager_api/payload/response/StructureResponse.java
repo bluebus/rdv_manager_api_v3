@@ -10,7 +10,6 @@ public record StructureResponse(
         String address,
         String phone,
         String email,
-        String timezone,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
         ) {}

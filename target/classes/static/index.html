@@ -557,6 +557,8 @@
         // Store token and user info in memory (never in localStorage for security)
         token = data.token;
         currentUser = data;
+        sessionStorage.setItem('rdv_token', data.token);
+        sessionStorage.setItem('rdv_user', JSON.stringify(data));
         enterApp();
       } else if (res.status === 401) {
         showMsg('auth-msg', 'error', 'Incorrect email or password. Please try again.');
@@ -583,6 +585,8 @@
   function doLogout() {
     token = null; currentUser = null;
     selectedService = null; selectedSlot = null;
+    sessionStorage.removeItem('rdv_token');
+    sessionStorage.removeItem('rdv_user');
     $('auth-section').classList.remove('hidden');
     $('app-section').classList.add('hidden');
     $('login-password').value = '';
@@ -782,7 +786,7 @@
           </div>
           <div class="field-row">
             <span class="field-label">Created</span>
-            <span>${new Date(b.createdAt).toLocaleString()}</span>
+            <span>${fmtLocalDateTime(b.createdAt)}</span>
           </div>
         </div>`).join('');
     } catch (e) {
@@ -798,6 +802,44 @@
       .replace(/&/g,'&amp;').replace(/</g,'&lt;')
       .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
+
+  // ─── FORMAT LocalDateTime from Spring ─────────────────────────
+  // Spring serializes LocalDateTime as array [year,month,day,hour,min,sec]
+  // or as ISO string depending on Jackson config.
+  // This handles both formats safely.
+  function fmtLocalDateTime(val) {
+    if (!val) return '—';
+
+    // Array format: [2026, 6, 14, 10, 30, 0]
+    if (Array.isArray(val)) {
+      const [year, month, day, hour = 0, min = 0, sec = 0] = val;
+      // month is 1-based from Java, Date() needs 0-based
+      return new Date(year, month - 1, day, hour, min, sec).toLocaleString();
+    }
+
+    // ISO string format: "2026-06-14T10:30:00"
+    if (typeof val === 'string') {
+      return new Date(val).toLocaleString();
+    }
+
+    return '—';
+  }
+
+  // ─── RESTORE SESSION ON PAGE LOAD ─────────────────────────────
+  (function restoreSession() {
+    const savedToken = sessionStorage.getItem('rdv_token');
+    const savedUser  = sessionStorage.getItem('rdv_user');
+    if (savedToken && savedUser) {
+      try {
+        token = savedToken;
+        currentUser = JSON.parse(savedUser);
+        enterApp();
+      } catch(e) {
+        sessionStorage.removeItem('rdv_token');
+        sessionStorage.removeItem('rdv_user');
+      }
+    }
+  })();
 </script>
 </body>
 </html>

@@ -27,6 +27,7 @@ public class ServiceEntityServiceImpl implements ServiceEntityService {
     public ServiceResponse create(CreateServiceRequest request) {
         ServiceEntity entity = mapper.toEntity(request);
         entity.setId(UUID.randomUUID());
+        entity.setTimezone("Asia/Kuala_Lumpur"); // default — not exposed to frontend
         ServiceEntity saved = repository.save(entity);
         return mapper.toResponse(saved);
     }

@@ -8,6 +8,9 @@ spring:
     mongodb:
       uri: mongodb://localhost:27017
       database: rdv_manager_db_202606_test
+  jackson: #202606 added to define the datetime format
+    serialization:
+      write-dates-as-timestamps: false #end new part
   profiles:
     active: debug
   servlet:
@@ -28,3 +31,4 @@ app: # 202606 added for JWT config
   jwt:
     secret: 9d4deec43e5c4d7fd35edc20010d8f506e178721fb5aaac19e98de66fabcb423   # min 32 chars
     expiration-ms: 86400000   # 24 hours
+  

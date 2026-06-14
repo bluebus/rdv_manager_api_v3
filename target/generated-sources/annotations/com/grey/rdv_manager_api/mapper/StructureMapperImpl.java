@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-06-14T20:08:37+0800",
+    date = "2026-06-14T21:02:48+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 17.0.19 (Eclipse Adoptium)"
 )
 @Component
@@ -32,7 +32,6 @@ public class StructureMapperImpl implements StructureMapper {
         structure.address( dto.address() );
         structure.phone( dto.phone() );
         structure.email( dto.email() );
-        structure.timezone( dto.timezone() );
 
         return structure.build();
     }
@@ -58,9 +57,6 @@ public class StructureMapperImpl implements StructureMapper {
         if ( dto.email() != null ) {
             entity.setEmail( dto.email() );
         }
-        if ( dto.timezone() != null ) {
-            entity.setTimezone( dto.timezone() );
-        }
 
         return entity;
     }
@@ -77,7 +73,6 @@ public class StructureMapperImpl implements StructureMapper {
         String address = null;
         String phone = null;
         String email = null;
-        String timezone = null;
         LocalDateTime createdAt = null;
         LocalDateTime updatedAt = null;
 
@@ -87,11 +82,10 @@ public class StructureMapperImpl implements StructureMapper {
         address = entity.getAddress();
         phone = entity.getPhone();
         email = entity.getEmail();
-        timezone = entity.getTimezone();
         createdAt = entity.getCreatedAt();
         updatedAt = entity.getUpdatedAt();
 
-        StructureResponse structureResponse = new StructureResponse( id, name, description, address, phone, email, timezone, createdAt, updatedAt );
+        StructureResponse structureResponse = new StructureResponse( id, name, description, address, phone, email, createdAt, updatedAt );
 
         return structureResponse;
     }
