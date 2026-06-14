@@ -56,7 +56,6 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: var(--font-sans); background: var(--color-background-tertiary); min-height: 100vh; color: var(--color-text-primary); }
 
-    /* ── LAYOUT ── */
     .layout { display: flex; min-height: 100vh; }
     .sidebar {
       width: 220px; flex-shrink: 0;
@@ -67,7 +66,7 @@
     }
     .sidebar-logo { padding: 0 1.25rem 1.25rem; border-bottom: 0.5px solid var(--color-border-tertiary); margin-bottom: 0.75rem; }
     .sidebar-logo p { font-size: 15px; font-weight: 500; }
-    .sidebar-logo span { font-size: 11px; color: var(--color-text-secondary); background: var(--color-background-warning); color: var(--color-text-warning); padding: 1px 8px; border-radius: 4px; }
+    .sidebar-logo span { font-size: 11px; background: var(--color-background-warning); color: var(--color-text-warning); padding: 1px 8px; border-radius: 4px; }
     .nav-section { padding: 0.5rem 1.25rem 0.25rem; font-size: 11px; color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.05em; }
     .nav-item {
       display: flex; align-items: center; gap: 8px;
@@ -82,7 +81,6 @@
     .topbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; }
     .topbar h1 { font-size: 18px; font-weight: 500; }
 
-    /* ── CARDS / TABLES ── */
     .card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1.25rem; margin-bottom: 1rem; }
     .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
     .card-title { font-size: 14px; font-weight: 500; }
@@ -93,7 +91,6 @@
     tr:last-child td { border-bottom: none; }
     tr:hover td { background: var(--color-background-secondary); }
 
-    /* ── FORMS ── */
     label { display: block; font-size: 12px; color: var(--color-text-secondary); margin-bottom: 3px; margin-top: 10px; }
     label:first-child { margin-top: 0; }
     input, select, textarea {
@@ -106,9 +103,7 @@
     input:focus, select:focus, textarea:focus { border-color: var(--color-border-primary); }
     textarea { resize: vertical; min-height: 60px; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .form-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
 
-    /* ── BUTTONS ── */
     .btn { padding: 7px 14px; font-size: 13px; font-weight: 500; cursor: pointer; border-radius: var(--border-radius-md); transition: opacity 0.15s; border: 0.5px solid transparent; }
     .btn:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-primary { background: var(--color-text-primary); color: var(--color-background-primary); border-color: var(--color-text-primary); }
@@ -121,7 +116,6 @@
     .btn-success:hover:not(:disabled) { background: var(--color-background-success); }
     .btn-sm { padding: 4px 10px; font-size: 12px; }
 
-    /* ── ALERTS / BADGES ── */
     .alert { padding: 8px 12px; border-radius: var(--border-radius-md); font-size: 13px; margin-bottom: 1rem; }
     .alert-error   { background: var(--color-background-danger);  color: var(--color-text-danger);  border: 0.5px solid var(--color-border-danger); }
     .alert-success { background: var(--color-background-success); color: var(--color-text-success); border: 0.5px solid var(--color-border-success); }
@@ -133,7 +127,6 @@
     .badge-admin  { background: var(--color-background-danger); color: var(--color-text-danger); }
     .badge-client { background: var(--color-background-secondary); color: var(--color-text-secondary); }
 
-    /* ── MODAL ── */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 100; }
     .modal { background: var(--color-background-primary); border-radius: var(--border-radius-lg); padding: 1.5rem; width: 480px; max-width: 95vw; max-height: 90vh; overflow-y: auto; border: 0.5px solid var(--color-border-tertiary); }
     .modal-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; }
@@ -141,13 +134,11 @@
     .modal-close { background: none; border: none; cursor: pointer; color: var(--color-text-tertiary); font-size: 18px; padding: 2px; }
     .modal-footer { display: flex; gap: 8px; justify-content: flex-end; margin-top: 1.25rem; padding-top: 1rem; border-top: 0.5px solid var(--color-border-tertiary); }
 
-    /* ── LOGIN ── */
     .login-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 1rem; }
     .login-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 2rem; width: 380px; }
     .login-card h2 { font-size: 18px; font-weight: 500; margin-bottom: 0.25rem; }
     .login-card p { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 1.5rem; }
 
-    /* ── MISC ── */
     .spinner { display: inline-block; width: 13px; height: 13px; border: 2px solid currentColor; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; vertical-align: -2px; margin-right: 5px; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .empty { text-align: center; padding: 2rem; color: var(--color-text-tertiary); font-size: 13px; }
@@ -185,7 +176,6 @@
 <div id="admin-app" class="hidden">
   <div class="layout">
 
-    <!-- SIDEBAR -->
     <aside class="sidebar">
       <div class="sidebar-logo">
         <p>RDV Manager</p>
@@ -215,12 +205,11 @@
       <button class="nav-item" onclick="showSection('auditlogs')" id="nav-auditlogs">
         <i class="ti ti-history"></i>Audit logs
       </button>
-      <button class="nav-item" onclick="doLogout()" style="margin-top:auto">
+      <button class="nav-item" onclick="doLogout()">
         <i class="ti ti-logout"></i>Sign out
       </button>
     </aside>
 
-    <!-- MAIN -->
     <main class="main">
       <div class="topbar">
         <h1 id="section-title">Dashboard</h1>
@@ -228,7 +217,7 @@
       </div>
       <div id="page-msg"></div>
 
-      <!-- ── DASHBOARD ── -->
+      <!-- DASHBOARD -->
       <div id="section-dashboard">
         <div class="stat-grid">
           <div class="stat-card"><div class="stat-label">Structures</div><div class="stat-value" id="stat-structures">—</div></div>
@@ -242,7 +231,7 @@
         </div>
       </div>
 
-      <!-- ── STRUCTURES ── -->
+      <!-- STRUCTURES -->
       <div id="section-structures" class="hidden">
         <div class="card">
           <div class="card-header">
@@ -255,7 +244,7 @@
         </div>
       </div>
 
-      <!-- ── SERVICES ── -->
+      <!-- SERVICES -->
       <div id="section-services" class="hidden">
         <div class="card">
           <div class="card-header">
@@ -268,7 +257,7 @@
         </div>
       </div>
 
-      <!-- ── SLOTS ── -->
+      <!-- SLOTS -->
       <div id="section-slots" class="hidden">
         <div class="card">
           <div class="card-header">
@@ -281,7 +270,7 @@
         </div>
       </div>
 
-      <!-- ── CLIENTS ── -->
+      <!-- CLIENTS -->
       <div id="section-clients" class="hidden">
         <div class="card">
           <div class="card-header">
@@ -294,18 +283,18 @@
         </div>
       </div>
 
-      <!-- ── RESERVATIONS ── -->
+      <!-- RESERVATIONS -->
       <div id="section-reservations" class="hidden">
         <div class="card">
           <div class="card-header">
             <span class="card-title">Reservations</span>
-            <span style="font-size:12px;color:var(--color-text-secondary)">Update status to confirm or cancel bookings</span>
+            <span style="font-size:12px;color:var(--color-text-secondary)">Confirm or cancel bookings</span>
           </div>
           <div id="reservations-table"><div class="empty"><i class="ti ti-loader"></i>Loading…</div></div>
         </div>
       </div>
 
-      <!-- ── AUDIT LOGS ── -->
+      <!-- AUDIT LOGS -->
       <div id="section-auditlogs" class="hidden">
         <div class="card">
           <div class="card-header">
@@ -315,12 +304,11 @@
           <div id="auditlogs-table"><div class="empty"><i class="ti ti-loader"></i>Loading…</div></div>
         </div>
       </div>
-
     </main>
   </div>
 </div>
 
-<!-- ── MODAL ── -->
+<!-- MODAL -->
 <div id="modal" class="modal-overlay hidden" onclick="if(event.target===this)closeModal()">
   <div class="modal">
     <div class="modal-header">
@@ -338,22 +326,23 @@
 </div>
 
 <script>
-// ─── CONFIG ───────────────────────────────────────────────────────────────────
-const API = '';   // same origin — Spring Boot serves both
+const API = '';
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
-let token = null;
+let token        = null;
 let currentAdmin = null;
-let modalType = null;
-let modalData = null;     // null = create, object = edit
-let structures = [];      // cached for dropdowns
+let modalType    = null;
+let modalData    = null;
+let structures   = [];
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 
 function esc(s) {
   if (s == null) return '';
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function showMsg(type, text) {
@@ -365,25 +354,49 @@ function authHeaders() {
   return { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` };
 }
 
+// ─── DATE HELPERS ─────────────────────────────────────────────────────────────
 function parseSpringDate(val) {
-  if (!val) return null;
-  // Array: [year, month, day, hour, min, sec]
-  if (Array.isArray(val)) {
-    const [year, month, day, hour = 0, min = 0, sec = 0] = val;
-    return new Date(year, month - 1, day, hour, min, sec);
+  if (val == null || val === '') return null;
+  try {
+    // Array: [2026, 6, 14, 10, 30, 0] — Java LocalDateTime
+    if (Array.isArray(val)) {
+      const [year, month, day, hour = 0, min = 0, sec = 0] = val;
+      const d = new Date(year, month - 1, day, hour, min, sec);
+      return isNaN(d.getTime()) ? null : d;
+    }
+    // ISO string — strip nanoseconds, normalize timezone
+    if (typeof val === 'string') {
+      const cleaned     = val.replace(/(\.\d{3})\d+/, '$1');
+      const hasTimezone = cleaned.endsWith('Z') || /[+-]\d{2}:?\d{2}$/.test(cleaned);
+      const normalized  = hasTimezone ? cleaned : cleaned + 'Z';
+      const d = new Date(normalized);
+      return isNaN(d.getTime()) ? null : d;
+    }
+    // Epoch ms
+    if (typeof val === 'number') return new Date(val);
+  } catch(e) {
+    console.warn('parseSpringDate failed:', val, e);
   }
-  // ISO string
-  return new Date(val);
+  return null;
 }
 
-function fmtDate(s) {
-  const d = parseSpringDate(s);
+function fmtDate(val) {
+  const d = parseSpringDate(val);
   return d ? d.toLocaleDateString() : '—';
 }
 
-function fmtDateTime(s) {
-  const d = parseSpringDate(s);
+function fmtDateTime(val) {
+  const d = parseSpringDate(val);
   return d ? d.toLocaleString() : '—';
+}
+
+// ─── UUID MAP HELPERS ─────────────────────────────────────────────────────────
+function buildMap(arr) {
+  return Object.fromEntries((arr || []).map(item => [String(item.id), item]));
+}
+
+function lookupId(map, id) {
+  return id ? (map[String(id)] || null) : null;
 }
 
 function setLoading(spinnerId, btnId, on) {
@@ -392,7 +405,6 @@ function setLoading(spinnerId, btnId, on) {
 }
 
 // ─── AUTH ─────────────────────────────────────────────────────────────────────
-// POST /api/auth/login — only allows ADMIN role through
 async function doLogin() {
   const email = $('login-email').value.trim();
   const pass  = $('login-password').value;
@@ -406,16 +418,15 @@ async function doLogin() {
       body: JSON.stringify({ email, password: pass })
     });
     if (res.ok) {
-      const data = await res.json();
-      // roles is List<Role> serialised as ["ADMIN"] — check first element
+      const data  = await res.json();
       const roles = (data.roles || []).map(r => typeof r === 'string' ? r : r.toString());
       if (!roles.includes('ADMIN')) {
         return showLoginMsg('error', 'Access denied. ADMIN role required.');
       }
-      token = data.token;
+      token        = data.token;
       currentAdmin = data;
       sessionStorage.setItem('rdv_token', data.token);
-      sessionStorage.setItem('rdv_user', JSON.stringify(data));
+      sessionStorage.setItem('rdv_user',  JSON.stringify(data));
       $('login-screen').classList.add('hidden');
       $('admin-app').classList.remove('hidden');
       $('topbar-user').textContent = data.email;
@@ -442,10 +453,10 @@ function doLogout() {
   $('admin-app').classList.add('hidden');
   $('login-screen').classList.remove('hidden');
   $('login-password').value = '';
-  $('login-msg').innerHTML = '';
+  $('login-msg').innerHTML  = '';
 }
 
-// ─── SECTION NAVIGATION ───────────────────────────────────────────────────────
+// ─── NAVIGATION ───────────────────────────────────────────────────────────────
 const sections = ['dashboard','structures','services','slots','clients','reservations','auditlogs'];
 
 function showSection(name) {
@@ -464,76 +475,150 @@ function showSection(name) {
 
 function loadSection(name) {
   switch(name) {
-    case 'dashboard':    loadDashboard(); break;
-    case 'structures':   loadStructures(); break;
-    case 'services':     loadServices(); break;
-    case 'slots':        loadSlots(); break;
-    case 'clients':      loadClients(); break;
+    case 'dashboard':    loadDashboard();    break;
+    case 'structures':   loadStructures();   break;
+    case 'services':     loadServices();     break;
+    case 'slots':        loadSlots();        break;
+    case 'clients':      loadClients();      break;
     case 'reservations': loadReservations(); break;
-    case 'auditlogs':    loadAuditLogs(); break;
+    case 'auditlogs':    loadAuditLogs();    break;
   }
+}
+
+// ─── SHARED RESERVATION TABLE BUILDER ────────────────────────────────────────
+function buildReservationRows(reservations, clientMap, slotMap, serviceMap, structureMap) {
+  return reservations.map(r => {
+    const client    = lookupId(clientMap,    r.clientId);
+    const slot      = lookupId(slotMap,      r.slotId);
+    const service   = lookupId(serviceMap,   slot?.serviceId);
+    const structure = lookupId(structureMap, service?.structureId);
+
+    const clientNameHtml = client
+      ? `<div style="font-weight:500">${esc(client.firstName)} ${esc(client.lastName)}</div>
+         <div style="font-size:11px;color:var(--color-text-tertiary)">${esc(client.email)}</div>`
+      : `<div class="mono">${esc((r.clientId || '').substring(0, 8))}…</div>`;
+
+    const serviceNameHtml = service
+      ? `<div>${esc(service.name)}</div>
+         <div style="font-size:11px;color:var(--color-text-tertiary)">${esc(structure?.name || '—')}</div>`
+      : `<span class="mono">${esc((r.slotId || '').substring(0, 8))}…</span>`;
+
+    const dateHtml    = slot ? esc(slot.date)      : '—';
+    const timeHtml    = slot ? `${esc(slot.startTime)} – ${esc(slot.endTime)}` : '—';
+    const statusClass = (r.status || '').toLowerCase();
+
+    const actionsHtml = r.status === 'PENDING'
+      ? `<button class="btn btn-success btn-sm" onclick='updateReservation("${r.id}","CONFIRMED")'>Confirm</button>
+         <button class="btn btn-danger btn-sm"  onclick='updateReservation("${r.id}","CANCELLED")'>Cancel</button>`
+      : r.status === 'CONFIRMED'
+      ? `<button class="btn btn-danger btn-sm"  onclick='updateReservation("${r.id}","CANCELLED")'>Cancel</button>`
+      : `<span style="font-size:12px;color:var(--color-text-tertiary)">Closed</span>`;
+
+    return `
+      <tr>
+        <td>${clientNameHtml}</td>
+        <td>${serviceNameHtml}</td>
+        <td>${dateHtml}</td>
+        <td>${timeHtml}</td>
+        <td><span class="badge badge-${statusClass}">${esc(r.status)}</span></td>
+        <td>${fmtDateTime(r.createdAt)}</td>
+        <td><div class="actions">${actionsHtml}</div></td>
+      </tr>`;
+  }).join('');
+}
+
+function reservationTableHtml(rows) {
+  return `
+    <table>
+      <thead>
+        <tr>
+          <th>Client</th>
+          <th>Service / Structure</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Status</th>
+          <th>Booked on</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
 }
 
 // ─── DASHBOARD ────────────────────────────────────────────────────────────────
 async function loadDashboard() {
-  // Parallel fetch of all counts and recent reservations
-  const [sRes, svcRes, cRes, rRes] = await Promise.all([
-    fetch(`${API}/api/structures`, { headers: authHeaders() }),
-    fetch(`${API}/api/services`,   { headers: authHeaders() }),
-    fetch(`${API}/api/clients`,    { headers: authHeaders() }),
-    fetch(`${API}/api/reservations`, { headers: authHeaders() })
-  ]);
-  if (sRes.ok)   { const d = await sRes.json();   $('stat-structures').textContent   = d.length; }
-  if (svcRes.ok) { const d = await svcRes.json(); $('stat-services').textContent     = d.length; }
-  if (cRes.ok)   { const d = await cRes.json();   $('stat-clients').textContent      = d.length; }
-  if (rRes.ok)   {
-    const d = await rRes.json();
-    $('stat-reservations').textContent = d.length;
-    // Show latest 10 reservations
-    const recent = d.slice(-10).reverse();
+  try {
+    const [sRes, svcRes, cRes, rRes, slotRes, structRes] = await Promise.all([
+      fetch(`${API}/api/structures`,   { headers: authHeaders() }),
+      fetch(`${API}/api/services`,     { headers: authHeaders() }),
+      fetch(`${API}/api/clients`,      { headers: authHeaders() }),
+      fetch(`${API}/api/reservations`, { headers: authHeaders() }),
+      fetch(`${API}/api/slots`,        { headers: authHeaders() }),
+      fetch(`${API}/api/structures`,   { headers: authHeaders() })
+    ]);
+
+    if (sRes.ok)   { const d = await sRes.json();   $('stat-structures').textContent = d.length; }
+    if (svcRes.ok) { const d = await svcRes.json(); $('stat-services').textContent   = d.length; }
+    if (cRes.ok)   { const d = await cRes.json();   $('stat-clients').textContent    = d.length; }
+
+    if (!rRes.ok) { $('dash-reservations').innerHTML = '<div class="empty"><i class="ti ti-alert-circle"></i>Failed to load</div>'; return; }
+
+    const reservations = await rRes.json();
+    const slots        = slotRes.ok  ? await slotRes.json()  : [];
+    const structs      = structRes.ok ? await structRes.json() : [];
+
+    // fetch clients and services for lookup
+    const [clientRes2, svcRes2] = await Promise.all([
+      fetch(`${API}/api/clients`,  { headers: authHeaders() }),
+      fetch(`${API}/api/services`, { headers: authHeaders() })
+    ]);
+    const clients  = clientRes2.ok ? await clientRes2.json() : [];
+    const services = svcRes2.ok    ? await svcRes2.json()    : [];
+
+    $('stat-reservations').textContent = reservations.length;
+
+    const clientMap    = buildMap(clients);
+    const slotMap      = buildMap(slots);
+    const serviceMap   = buildMap(services);
+    const structureMap = buildMap(structs);
+
+    const recent = reservations.slice().reverse().slice(0, 10);
+
     if (!recent.length) {
       $('dash-reservations').innerHTML = '<div class="empty"><i class="ti ti-calendar-off"></i>No reservations yet</div>';
-    } else {
-      $('dash-reservations').innerHTML = `
-        <table>
-          <thead><tr><th>ID</th><th>Client ID</th><th>Slot ID</th><th>Status</th><th>Created</th></tr></thead>
-          <tbody>${recent.map(r => `
-            <tr>
-              <td class="mono">${esc(r.id?.substring(0,8))}…</td>
-              <td class="mono">${esc(r.clientId?.substring(0,8))}…</td>
-              <td class="mono">${esc(r.slotId?.substring(0,8))}…</td>
-              <td><span class="badge badge-${(r.status||'').toLowerCase()}">${esc(r.status)}</span></td>
-              <td>${fmtDate(r.createdAt)}</td>
-            </tr>`).join('')}
-          </tbody>
-        </table>`;
+      return;
     }
+
+    $('dash-reservations').innerHTML = reservationTableHtml(
+      buildReservationRows(recent, clientMap, slotMap, serviceMap, structureMap)
+    );
+  } catch(e) {
+    console.error('loadDashboard error:', e);
+    $('dash-reservations').innerHTML = `<div class="empty" style="color:var(--color-text-danger)"><i class="ti ti-alert-circle"></i>Failed to load: ${e.message}</div>`;
   }
 }
 
-// ─── STRUCTURES ──────────────────────────────────────────────────────────────
-// GET /api/structures  — list all structures
+// ─── STRUCTURES ───────────────────────────────────────────────────────────────
 async function loadStructures() {
   $('structures-table').innerHTML = '<div class="empty"><i class="ti ti-loader"></i>Loading…</div>';
   try {
     const res = await fetch(`${API}/api/structures`, { headers: authHeaders() });
     if (!res.ok) throw new Error(res.status);
     const data = await res.json();
-    structures = data; // cache for service dropdowns
+    structures = data;
     if (!data.length) {
       $('structures-table').innerHTML = '<div class="empty"><i class="ti ti-building-off"></i>No structures yet</div>';
       return;
     }
     $('structures-table').innerHTML = `
       <table>
-        <thead><tr><th>Name</th><th>Address</th><th>Phone</th><th>Email</th><th>Timezone</th><th>Actions</th></tr></thead>
+        <thead><tr><th>Name</th><th>Address</th><th>Phone</th><th>Email</th><th>Actions</th></tr></thead>
         <tbody>${data.map(s => `
           <tr>
             <td style="font-weight:500">${esc(s.name)}</td>
             <td>${esc(s.address)}</td>
             <td>${esc(s.phone)}</td>
             <td>${esc(s.email)}</td>
-            <td>${esc(s.timezone)}</td>
             <td><div class="actions">
               <button class="btn btn-secondary btn-sm" onclick='openModal("structure",${JSON.stringify(s)})'><i class="ti ti-edit" style="font-size:12px"></i></button>
               <button class="btn btn-danger btn-sm" onclick='deleteItem("structures","${s.id}","structure")'><i class="ti ti-trash" style="font-size:12px"></i></button>
@@ -547,11 +632,9 @@ async function loadStructures() {
 }
 
 // ─── SERVICES ─────────────────────────────────────────────────────────────────
-// GET /api/services  — list all services (ADMIN+STAFF)
 async function loadServices() {
   $('services-table').innerHTML = '<div class="empty"><i class="ti ti-loader"></i>Loading…</div>';
   try {
-    // Ensure structures are cached for display
     if (!structures.length) {
       const sr = await fetch(`${API}/api/structures`, { headers: authHeaders() });
       if (sr.ok) structures = await sr.json();
@@ -563,21 +646,22 @@ async function loadServices() {
       $('services-table').innerHTML = '<div class="empty"><i class="ti ti-briefcase-off"></i>No services yet</div>';
       return;
     }
-    const structMap = Object.fromEntries(structures.map(s => [s.id, s.name]));
+    const structMap = buildMap(structures);
     $('services-table').innerHTML = `
       <table>
-        <thead><tr><th>Name</th><th>Description</th><th>Structure</th><th>Timezone</th><th>Actions</th></tr></thead>
-        <tbody>${data.map(s => `
-          <tr>
+        <thead><tr><th>Name</th><th>Description</th><th>Structure</th><th>Actions</th></tr></thead>
+        <tbody>${data.map(s => {
+          const struct = lookupId(structMap, s.structureId);
+          return `<tr>
             <td style="font-weight:500">${esc(s.name)}</td>
             <td>${esc(s.description || '—')}</td>
-            <td>${esc(structMap[s.structureId] || s.structureId?.substring(0,8)+'…')}</td>
-            <td>${esc(s.timezone)}</td>
+            <td>${esc(struct?.name || s.structureId?.substring(0,8)+'…')}</td>
             <td><div class="actions">
               <button class="btn btn-secondary btn-sm" onclick='openModal("service",${JSON.stringify(s)})'><i class="ti ti-edit" style="font-size:12px"></i></button>
               <button class="btn btn-danger btn-sm" onclick='deleteItem("services","${s.id}","service")'><i class="ti ti-trash" style="font-size:12px"></i></button>
             </div></td>
-          </tr>`).join('')}
+          </tr>`;
+        }).join('')}
         </tbody>
       </table>`;
   } catch(e) {
@@ -586,47 +670,78 @@ async function loadServices() {
 }
 
 // ─── SLOTS ────────────────────────────────────────────────────────────────────
-// GET /api/slots  — list all time slots (ADMIN+STAFF can manage, any auth can GET)
 async function loadSlots() {
   $('slots-table').innerHTML = '<div class="empty"><i class="ti ti-loader"></i>Loading…</div>';
   try {
-    const [svcRes, slotRes] = await Promise.all([
-      fetch(`${API}/api/services`, { headers: authHeaders() }),
-      fetch(`${API}/api/slots`,    { headers: authHeaders() })
+    const [svcRes, slotRes, structRes] = await Promise.all([
+      fetch(`${API}/api/services`,   { headers: authHeaders() }),
+      fetch(`${API}/api/slots`,      { headers: authHeaders() }),
+      fetch(`${API}/api/structures`, { headers: authHeaders() })
     ]);
-    const services = svcRes.ok ? await svcRes.json() : [];
+
+    const services = svcRes.ok    ? await svcRes.json()    : [];
+    const structs  = structRes.ok ? await structRes.json() : [];
     if (!slotRes.ok) throw new Error(slotRes.status);
     const data = await slotRes.json();
+
     if (!data.length) {
       $('slots-table').innerHTML = '<div class="empty"><i class="ti ti-clock-off"></i>No slots yet</div>';
       return;
     }
-    const svcMap = Object.fromEntries(services.map(s => [s.id, s.name]));
+
+    const svcMap    = buildMap(services);
+    const structMap = buildMap(structs);
+
     $('slots-table').innerHTML = `
       <table>
-        <thead><tr><th>Service</th><th>Date</th><th>Start</th><th>End</th><th>Capacity</th><th>Available</th><th>Actions</th></tr></thead>
-        <tbody>${data.map(s => `
+        <thead>
           <tr>
-            <td>${esc(svcMap[s.serviceId] || s.serviceId?.substring(0,8)+'…')}</td>
-            <td>${esc(s.date)}</td>
-            <td>${esc(s.startTime)}</td>
-            <td>${esc(s.endTime)}</td>
-            <td>${s.capacity}</td>
-            <td><span style="color:${s.available>0?'var(--color-text-success)':'var(--color-text-danger)'};font-weight:500">${s.available}</span></td>
-            <td><div class="actions">
-              <button class="btn btn-secondary btn-sm" onclick='openModal("slot",${JSON.stringify(s)})'><i class="ti ti-edit" style="font-size:12px"></i></button>
-              <button class="btn btn-danger btn-sm" onclick='deleteItem("slots","${s.id}","slot")'><i class="ti ti-trash" style="font-size:12px"></i></button>
-            </div></td>
-          </tr>`).join('')}
+            <th>Service / Structure</th>
+            <th>Date</th>
+            <th>Start</th>
+            <th>End</th>
+            <th>Capacity</th>
+            <th>Available</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>${data.map(s => {
+          const svc     = lookupId(svcMap,    s.serviceId);
+          const struct  = lookupId(structMap, svc?.structureId);
+          return `
+            <tr>
+              <td>
+                <div style="font-weight:500">${esc(svc?.name || s.serviceId?.substring(0,8)+'…')}</div>
+                <div style="font-size:11px;color:var(--color-text-tertiary)">
+                  <i class="ti ti-building" style="font-size:11px;vertical-align:-1px;margin-right:2px"></i>
+                  ${esc(struct?.name || '—')}
+                </div>
+              </td>
+              <td>${esc(s.date)}</td>
+              <td>${esc(s.startTime)}</td>
+              <td>${esc(s.endTime)}</td>
+              <td>${s.capacity}</td>
+              <td>
+                <span style="color:${s.available > 0 ? 'var(--color-text-success)' : 'var(--color-text-danger)'};font-weight:500">
+                  ${s.available}
+                </span>
+              </td>
+              <td><div class="actions">
+                <button class="btn btn-secondary btn-sm" onclick='openModal("slot",${JSON.stringify(s)})'><i class="ti ti-edit" style="font-size:12px"></i></button>
+                <button class="btn btn-danger btn-sm" onclick='deleteItem("slots","${s.id}","slot")'><i class="ti ti-trash" style="font-size:12px"></i></button>
+              </div></td>
+            </tr>`;
+        }).join('')}
         </tbody>
       </table>`;
+
   } catch(e) {
+    console.error('loadSlots error:', e);
     $('slots-table').innerHTML = '<div class="empty" style="color:var(--color-text-danger)"><i class="ti ti-alert-circle"></i>Failed to load</div>';
   }
 }
 
 // ─── CLIENTS ──────────────────────────────────────────────────────────────────
-// GET /api/clients  — list all clients (ADMIN+STAFF)
 async function loadClients() {
   $('clients-table').innerHTML = '<div class="empty"><i class="ti ti-loader"></i>Loading…</div>';
   try {
@@ -641,7 +756,7 @@ async function loadClients() {
       <table>
         <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Roles</th><th>Created</th><th>Actions</th></tr></thead>
         <tbody>${data.map(c => {
-          const roles = Array.isArray(c.roles) ? c.roles : [];
+          const roles      = Array.isArray(c.roles) ? c.roles : [];
           const roleBadges = roles.map(r => {
             const rv = typeof r === 'string' ? r : String(r);
             return `<span class="badge badge-${rv.toLowerCase()}">${esc(rv)}</span>`;
@@ -666,17 +781,15 @@ async function loadClients() {
 }
 
 // ─── RESERVATIONS ─────────────────────────────────────────────────────────────
-// GET /api/reservations  — any authenticated user
-// PUT /api/reservations/{id}  — update status (CONFIRMED / CANCELLED)
 async function loadReservations() {
   $('reservations-table').innerHTML = '<div class="empty"><i class="ti ti-loader"></i>Loading…</div>';
   try {
-    // fetch all data in parallel
-    const [rRes, clientRes, slotRes, svcRes] = await Promise.all([
+    const [rRes, clientRes, slotRes, svcRes, structRes] = await Promise.all([
       fetch(`${API}/api/reservations`, { headers: authHeaders() }),
       fetch(`${API}/api/clients`,      { headers: authHeaders() }),
       fetch(`${API}/api/slots`,        { headers: authHeaders() }),
-      fetch(`${API}/api/services`,     { headers: authHeaders() })
+      fetch(`${API}/api/services`,     { headers: authHeaders() }),
+      fetch(`${API}/api/structures`,   { headers: authHeaders() })
     ]);
 
     if (!rRes.ok) throw new Error(rRes.status);
@@ -685,79 +798,29 @@ async function loadReservations() {
     const clients      = clientRes.ok  ? await clientRes.json()  : [];
     const slots        = slotRes.ok    ? await slotRes.json()    : [];
     const services     = svcRes.ok     ? await svcRes.json()     : [];
+    const structs      = structRes.ok  ? await structRes.json()  : [];
 
-    // build lookup maps
-    const clientMap  = Object.fromEntries(clients.map(c => [c.id, c]));
-    const slotMap    = Object.fromEntries(slots.map(s => [s.id, s]));
-    const serviceMap = Object.fromEntries(services.map(s => [s.id, s]));
+    const clientMap    = buildMap(clients);
+    const slotMap      = buildMap(slots);
+    const serviceMap   = buildMap(services);
+    const structureMap = buildMap(structs);
 
     if (!reservations.length) {
       $('reservations-table').innerHTML = '<div class="empty"><i class="ti ti-calendar-off"></i>No reservations yet</div>';
       return;
     }
 
-    $('reservations-table').innerHTML = `
-      <table>
-        <thead>
-          <tr>
-            <th>Client</th>
-            <th>Service</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Status</th>
-            <th>Booked on</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${reservations.map(r => {
-            const client  = clientMap[r.clientId]           || null;
-            const slot    = slotMap[r.slotId]               || null;
-            const service = slot ? serviceMap[slot.serviceId] : null;
-
-            const clientName  = client
-              ? escHtml(client.firstName + ' ' + client.lastName)
-              : `<span class="mono">${esc(r.clientId?.substring(0,8))}…</span>`;
-
-            const serviceName = service
-              ? escHtml(service.name)
-              : `<span class="mono">${esc(r.slotId?.substring(0,8))}…</span>`;
-
-            const date = slot?.date     || '—';
-            const time = slot
-              ? escHtml(slot.startTime) + ' – ' + escHtml(slot.endTime)
-              : '—';
-
-            return `
-              <tr>
-                <td>
-                  <div style="font-weight:500">${clientName}</div>
-                  <div style="font-size:11px;color:var(--color-text-tertiary)">${esc(client?.email || '')}</div>
-                </td>
-                <td>${serviceName}</td>
-                <td>${esc(date)}</td>
-                <td>${time}</td>
-                <td><span class="badge badge-${(r.status||'').toLowerCase()}">${esc(r.status)}</span></td>
-                <td>${fmtDateTime(r.createdAt)}</td>
-                <td><div class="actions">
-                  ${r.status === 'PENDING' ? `
-                    <button class="btn btn-success btn-sm" onclick='updateReservation("${r.id}","CONFIRMED")'>Confirm</button>
-                    <button class="btn btn-danger btn-sm"  onclick='updateReservation("${r.id}","CANCELLED")'>Cancel</button>
-                  ` : r.status === 'CONFIRMED' ? `
-                    <button class="btn btn-danger btn-sm"  onclick='updateReservation("${r.id}","CANCELLED")'>Cancel</button>
-                  ` : '<span style="font-size:12px;color:var(--color-text-tertiary)">Closed</span>'}
-                </div></td>
-              </tr>`;
-          }).join('')}
-        </tbody>
-      </table>`;
+    $('reservations-table').innerHTML = reservationTableHtml(
+      buildReservationRows(reservations, clientMap, slotMap, serviceMap, structureMap)
+    );
 
   } catch(e) {
-    $('reservations-table').innerHTML = '<div class="empty" style="color:var(--color-text-danger)"><i class="ti ti-alert-circle"></i>Failed to load</div>';
+    console.error('loadReservations error:', e);
+    $('reservations-table').innerHTML = `<div class="empty" style="color:var(--color-text-danger)"><i class="ti ti-alert-circle"></i>Failed to load: ${e.message}</div>`;
   }
 }
 
-// PUT /api/reservations/{id} — update reservation status
+// ─── UPDATE RESERVATION STATUS ────────────────────────────────────────────────
 async function updateReservation(id, status) {
   try {
     const res = await fetch(`${API}/api/reservations/${id}`, {
@@ -777,7 +840,6 @@ async function updateReservation(id, status) {
 }
 
 // ─── AUDIT LOGS ───────────────────────────────────────────────────────────────
-// GET /api/audit-logs  — ADMIN only, read-only
 async function loadAuditLogs() {
   $('auditlogs-table').innerHTML = '<div class="empty"><i class="ti ti-loader"></i>Loading…</div>';
   try {
@@ -794,7 +856,7 @@ async function loadAuditLogs() {
         <tbody>${data.slice().reverse().map(l => `
           <tr>
             <td style="font-weight:500">${esc(l.entityName)}</td>
-            <td class="mono">${esc(l.entityId?.substring(0,8))}…</td>
+            <td class="mono">${esc((l.entityId || '').substring(0, 8))}…</td>
             <td>${esc(l.action)}</td>
             <td>${esc(l.performedBy || '—')}</td>
             <td>${fmtDateTime(l.timestamp)}</td>
@@ -807,7 +869,6 @@ async function loadAuditLogs() {
 }
 
 // ─── DELETE ───────────────────────────────────────────────────────────────────
-// DELETE /api/{endpoint}/{id}
 async function deleteItem(endpoint, id, label) {
   if (!confirm(`Delete this ${label}? This cannot be undone.`)) return;
   try {
@@ -829,19 +890,15 @@ function closeModal() { $('modal').classList.add('hidden'); }
 function openModal(type, data) {
   modalType = type;
   modalData = data;
-  $('modal-title').textContent = data ? `Edit ${type}` : `New ${type}`;
-  $('modal-body').innerHTML = buildForm(type, data);
+  $('modal-title').textContent  = data ? `Edit ${type}` : `New ${type}`;
+  $('modal-body').innerHTML     = buildForm(type, data);
   $('modal').classList.remove('hidden');
-  $('modal-save').disabled = false;
+  $('modal-save').disabled      = false;
   $('modal-spinner').classList.add('hidden');
 }
 
 function buildForm(type, d) {
   switch(type) {
-
-    // ── Structure form ──────────────────────────────────────────────────────
-    // POST /api/structures  body: { name, description, address, phone, email, timezone }
-    // PUT  /api/structures/{id}
     case 'structure': return `
       <label>Name *</label>
       <input id="f-name" value="${esc(d?.name||'')}">
@@ -852,45 +909,38 @@ function buildForm(type, d) {
       <div class="form-row">
         <div><label>Phone * (e.g. +60123456789)</label><input id="f-phone" value="${esc(d?.phone||'')}"></div>
         <div><label>Email *</label><input type="email" id="f-email" value="${esc(d?.email||'')}"></div>
-      </div>
-      <input id="f-timezone" value="${esc(d?.timezone||'')}">`;
+      </div>`;
 
-    // ── Service form ─────────────────────────────────────────────────────────
-    // POST /api/services  body: { structureId, name, description, timezone }
-    // PUT  /api/services/{id}
     case 'service': return `
       <label>Structure *</label>
       <select id="f-structureId">
         <option value="">— select structure —</option>
-        ${structures.map(s=>`<option value="${s.id}" ${d?.structureId===s.id?'selected':''}>${esc(s.name)}</option>`).join('')}
+        ${structures.map(s => `<option value="${s.id}" ${String(d?.structureId)===String(s.id)?'selected':''}>${esc(s.name)}</option>`).join('')}
       </select>
       <label>Service name *</label>
       <input id="f-name" value="${esc(d?.name||'')}">
       <label>Description</label>
-      <textarea id="f-description">${esc(d?.description||'')}</textarea>
-      <input id="f-timezone" value="${esc(d?.timezone||'')}">`;
+      <textarea id="f-description">${esc(d?.description||'')}</textarea>`;
 
-    // ── Slot form ────────────────────────────────────────────────────────────
-    // POST /api/slots  body: { serviceId, date, startTime, endTime, capacity }
-    // PUT  /api/slots/{id}  body: { date, startTime, endTime, capacity, available }
     case 'slot': return `
-      ${!d ? `<label>Service *</label>
-      <select id="f-serviceId" style="margin-bottom:10px">
-        <option value="">— select service —</option>
-      </select>` : `<p style="font-size:12px;color:var(--color-text-secondary);margin-bottom:10px">Service: <strong>${esc(d.serviceId?.substring(0,8))}…</strong> (cannot change)</p>`}
+      ${!d
+        ? `<label>Service *</label>
+           <select id="f-serviceId" style="margin-bottom:10px">
+             <option value="">— select service —</option>
+           </select>`
+        : `<p style="font-size:12px;color:var(--color-text-secondary);margin-bottom:10px">
+             Service: <strong>${esc((d.serviceId||'').substring(0,8))}…</strong> (cannot change)
+           </p>`}
       <div class="form-row">
         <div><label>Date *</label><input type="date" id="f-date" value="${esc(d?.date||'')}"></div>
         <div><label>Capacity *</label><input type="number" id="f-capacity" min="1" value="${d?.capacity||1}"></div>
       </div>
       <div class="form-row">
-        <div><label>Start time *</label><input type="time" id="f-startTime" value="${esc(d?.startTime?.substring(0,5)||'')}"></div>
-        <div><label>End time *</label><input type="time" id="f-endTime" value="${esc(d?.endTime?.substring(0,5)||'')}"></div>
+        <div><label>Start time *</label><input type="time" id="f-startTime" value="${esc((d?.startTime||'').substring(0,5))}"></div>
+        <div><label>End time *</label><input type="time" id="f-endTime" value="${esc((d?.endTime||'').substring(0,5))}"></div>
       </div>
-      ${d ? `<label>Available spots</label><input type="number" id="f-available" min="0" value="${d?.available??d?.capacity}">` : ''}`;
+      ${d ? `<label>Available spots</label><input type="number" id="f-available" min="0" value="${d?.available ?? d?.capacity}">` : ''}`;
 
-    // ── Client form ──────────────────────────────────────────────────────────
-    // POST /api/auth/register  body: { firstName, lastName, email, phone, password, roles }
-    // PUT  /api/clients/{id}
     case 'client': return `
       <div class="form-row">
         <div><label>First name *</label><input id="f-firstName" value="${esc(d?.firstName||'')}"></div>
@@ -904,8 +954,10 @@ function buildForm(type, d) {
       <label>Role *</label>
       <select id="f-role">
         ${['CLIENT','ADMIN'].map(r => {
-          const currentRoles = Array.isArray(d?.roles) ? d.roles.map(x => typeof x === 'string' ? x : String(x)) : [];
-          return `<option value="${r}" ${currentRoles.includes(r)?'selected':''}>${r}</option>`;
+          const current = Array.isArray(d?.roles)
+            ? d.roles.map(x => typeof x === 'string' ? x : String(x))
+            : [];
+          return `<option value="${r}" ${current.includes(r)?'selected':''}>${r}</option>`;
         }).join('')}
       </select>`;
 
@@ -925,11 +977,10 @@ async function submitModal() {
     if (res.ok || res.status === 201) {
       showMsg('success', `${modalType.charAt(0).toUpperCase()+modalType.slice(1)} ${modalData?'updated':'created'} successfully.`);
       closeModal();
-      // reload the relevant section
       const sectionMap = { structure:'structures', service:'services', slot:'slots', client:'clients' };
       loadSection(sectionMap[modalType] || modalType+'s');
     } else {
-      const err = await res.json().catch(()=>({}));
+      const err = await res.json().catch(() => ({}));
       showMsg('error', err.message || `Save failed (HTTP ${res.status}).`);
     }
   } catch(e) {
@@ -942,20 +993,19 @@ function val(id) { return $(id)?.value?.trim() || ''; }
 
 async function buildRequest(type, d) {
   switch(type) {
-
     case 'structure': {
       const name = val('f-name'), address = val('f-address');
-      const phone = val('f-phone'), email = val('f-email'), timezone = val('f-timezone');
-      if (!name || !address || !phone || !email || !timezone) { showMsg('error','Fill in all required fields.'); return null; }
+      const phone = val('f-phone'), email = val('f-email');
+      if (!name || !address || !phone || !email) { showMsg('error','Fill in all required fields.'); return null; }
       const body = { name, description: val('f-description'), address, phone, email };
       return d
-        ? { url: `${API}/api/structures/${d.id}`, method: 'PUT', body }
+        ? { url: `${API}/api/structures/${d.id}`, method: 'PUT',  body }
         : { url: `${API}/api/structures`,          method: 'POST', body };
     }
 
     case 'service': {
-      const structureId = val('f-structureId'), name = val('f-name'), timezone = val('f-timezone');
-      if (!name || !timezone) { showMsg('error','Fill in all required fields.'); return null; }
+      const structureId = val('f-structureId'), name = val('f-name');
+      if (!name) { showMsg('error','Service name is required.'); return null; }
       const body = { name, description: val('f-description') };
       if (!d) {
         if (!structureId) { showMsg('error','Select a structure.'); return null; }
@@ -980,54 +1030,51 @@ async function buildRequest(type, d) {
 
     case 'client': {
       const firstName = val('f-firstName'), lastName = val('f-lastName');
-      const email = val('f-email'), phone = val('f-phone');
-      const role = val('f-role');
+      const email = val('f-email'), phone = val('f-phone'), role = val('f-role');
       if (!firstName || !lastName || !email || !role) { showMsg('error','Fill in all required fields.'); return null; }
       if (!d) {
-        // Create via /api/auth/register
         const password = val('f-password');
         if (!password || password.length < 8) { showMsg('error','Password must be at least 8 characters.'); return null; }
-        return { url: `${API}/api/auth/register`, method: 'POST', body: { firstName, lastName, email, phone, password, roles: [role] } };
+        return { url: `${API}/api/auth/register`, method: 'POST',
+          body: { firstName, lastName, email, phone, password, roles: [role] } };
       }
-      // Update via /api/clients/{id} — UpdateClientRequest
-      return { url: `${API}/api/clients/${d.id}`, method: 'PUT', body: { firstName, lastName, email, phone, roles: new Set([role]) } };
+      return { url: `${API}/api/clients/${d.id}`, method: 'PUT',
+        body: { firstName, lastName, email, phone, roles: [role] } };
     }
 
     default: return null;
   }
 }
 
-// ─── SLOT MODAL — async populate service dropdown ─────────────────────────────
-// Override openModal to populate the service <select> after rendering
+// ─── SLOT MODAL: populate service dropdown async ──────────────────────────────
 const _openModal = openModal;
 window.openModal = async function(type, data) {
   _openModal(type, data);
   if (type === 'slot' && !data) {
-    // populate service dropdown after modal renders
     try {
       const res = await fetch(`${API}/api/services`, { headers: authHeaders() });
       if (res.ok) {
         const svcs = await res.json();
-        const sel = $('f-serviceId');
+        const sel  = $('f-serviceId');
         if (sel) {
           sel.innerHTML = '<option value="">— select service —</option>' +
-            svcs.map(s=>`<option value="${s.id}">${esc(s.name)}</option>`).join('');
+            svcs.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
         }
       }
     } catch(e) {}
   }
 };
 
-// ─── RESTORE SESSION ON PAGE LOAD ─────────────────────────────
+// ─── RESTORE SESSION ON PAGE LOAD ────────────────────────────────────────────
 (function restoreSession() {
   const savedToken = sessionStorage.getItem('rdv_token');
   const savedUser  = sessionStorage.getItem('rdv_user');
   if (savedToken && savedUser) {
     try {
-      const data = JSON.parse(savedUser);
+      const data  = JSON.parse(savedUser);
       const roles = (data.roles || []).map(r => typeof r === 'string' ? r : r.toString());
-      if (!roles.includes('ADMIN')) return; // safety check
-      token = savedToken;
+      if (!roles.includes('ADMIN')) return;
+      token        = savedToken;
       currentAdmin = data;
       $('login-screen').classList.add('hidden');
       $('admin-app').classList.remove('hidden');
@@ -1039,7 +1086,6 @@ window.openModal = async function(type, data) {
     }
   }
 })();
-
 </script>
 </body>
 </html>

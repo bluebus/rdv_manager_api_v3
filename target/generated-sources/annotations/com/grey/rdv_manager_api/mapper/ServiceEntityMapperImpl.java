@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-06-14T22:17:21+0800",
+    date = "2026-06-15T00:19:59+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 17.0.19 (Eclipse Adoptium)"
 )
 @Component
@@ -72,7 +72,9 @@ public class ServiceEntityMapperImpl implements ServiceEntityMapper {
         createdAt = entity.getCreatedAt();
         updatedAt = entity.getUpdatedAt();
 
-        ServiceResponse serviceResponse = new ServiceResponse( id, structureId, name, description, timezone, createdAt, updatedAt );
+        String structureName = null;
+
+        ServiceResponse serviceResponse = new ServiceResponse( id, structureId, structureName, name, description, timezone, createdAt, updatedAt );
 
         return serviceResponse;
     }

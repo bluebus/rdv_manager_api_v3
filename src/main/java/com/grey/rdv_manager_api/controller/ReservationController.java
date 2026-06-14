@@ -40,6 +40,15 @@ public class ReservationController {
         return ResponseEntity.ok(list);
     }
 
+    // ── 202606 filter by client — used by index.html My Bookings ──
+    @GetMapping("/by-client/{clientId}")
+    public ResponseEntity<List<ReservationResponse>> getByClient(
+            @PathVariable UUID clientId) {
+        List<ReservationResponse> list = reservationService.getByClientId(clientId);
+        return ResponseEntity.ok(list);
+    }
+    //end new part
+
     @PutMapping("/{id}")
     public ResponseEntity<ReservationResponse> updateReservation(
             @PathVariable UUID id,

@@ -17,6 +17,7 @@ import com.grey.rdv_manager_api.domain.enums.ReservationStatus;
 
 import java.util.List;
 import java.util.UUID;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +51,9 @@ public class ReservationServiceImpl implements ReservationService {
 
         //202606 set initial status for Reservation.status
         entity.setStatus(ReservationStatus.PENDING);  
+
+        entity.setCreatedAt(LocalDateTime.now());  // ← add this as fallback
+        entity.setUpdatedAt(LocalDateTime.now());  // ← add this as fallback
 
         Reservation saved = repository.save(entity);
         return mapper.toResponse(saved);
@@ -131,4 +135,11 @@ public class ReservationServiceImpl implements ReservationService {
 
         repository.deleteById(id);
     }
+
+    //202606 new part to extract the booking by using client ID
+    @Override
+    public List<ReservationResponse> getByClientId(UUID clientId) {
+        return mapper.toResponseList(repository.findByClientId(clientId));
+    }
+    //end new part
 }

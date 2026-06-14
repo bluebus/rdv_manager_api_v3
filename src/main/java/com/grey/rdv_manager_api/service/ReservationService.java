@@ -11,6 +11,7 @@ public interface ReservationService {
     ReservationResponse create(CreateReservationRequest request);
     ReservationResponse getById(UUID id);
     List<ReservationResponse> getAll();
+    List<ReservationResponse> getByClientId(UUID clientId); 
     ReservationResponse update(UUID id, UpdateReservationRequest request);
     void delete(UUID id);
 }

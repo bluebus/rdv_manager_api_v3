@@ -6,6 +6,7 @@ import java.util.UUID;
 public record ServiceResponse(
         UUID id,
         UUID structureId,
+        String structureName, 
         String name,
         String description,
         String timezone,
