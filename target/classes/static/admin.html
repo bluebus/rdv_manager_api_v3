@@ -671,34 +671,87 @@ async function loadClients() {
 async function loadReservations() {
   $('reservations-table').innerHTML = '<div class="empty"><i class="ti ti-loader"></i>Loading…</div>';
   try {
-    const res = await fetch(`${API}/api/reservations`, { headers: authHeaders() });
-    if (!res.ok) throw new Error(res.status);
-    const data = await res.json();
-    if (!data.length) {
+    // fetch all data in parallel
+    const [rRes, clientRes, slotRes, svcRes] = await Promise.all([
+      fetch(`${API}/api/reservations`, { headers: authHeaders() }),
+      fetch(`${API}/api/clients`,      { headers: authHeaders() }),
+      fetch(`${API}/api/slots`,        { headers: authHeaders() }),
+      fetch(`${API}/api/services`,     { headers: authHeaders() })
+    ]);
+
+    if (!rRes.ok) throw new Error(rRes.status);
+
+    const reservations = await rRes.json();
+    const clients      = clientRes.ok  ? await clientRes.json()  : [];
+    const slots        = slotRes.ok    ? await slotRes.json()    : [];
+    const services     = svcRes.ok     ? await svcRes.json()     : [];
+
+    // build lookup maps
+    const clientMap  = Object.fromEntries(clients.map(c => [c.id, c]));
+    const slotMap    = Object.fromEntries(slots.map(s => [s.id, s]));
+    const serviceMap = Object.fromEntries(services.map(s => [s.id, s]));
+
+    if (!reservations.length) {
       $('reservations-table').innerHTML = '<div class="empty"><i class="ti ti-calendar-off"></i>No reservations yet</div>';
       return;
     }
+
     $('reservations-table').innerHTML = `
       <table>
-        <thead><tr><th>ID</th><th>Client ID</th><th>Slot ID</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
-        <tbody>${data.map(r => `
+        <thead>
           <tr>
-            <td class="mono">${esc(r.id?.substring(0,8))}…</td>
-            <td class="mono">${esc(r.clientId?.substring(0,8))}…</td>
-            <td class="mono">${esc(r.slotId?.substring(0,8))}…</td>
-            <td><span class="badge badge-${(r.status||'').toLowerCase()}">${esc(r.status)}</span></td>
-            <td>${fmtDate(r.createdAt)}</td>
-            <td><div class="actions">
-              ${r.status==='PENDING'?`
-                <button class="btn btn-success btn-sm" onclick='updateReservation("${r.id}","CONFIRMED")'>Confirm</button>
-                <button class="btn btn-danger btn-sm" onclick='updateReservation("${r.id}","CANCELLED")'>Cancel</button>
-              `:r.status==='CONFIRMED'?`
-                <button class="btn btn-danger btn-sm" onclick='updateReservation("${r.id}","CANCELLED")'>Cancel</button>
-              `:'<span style="font-size:12px;color:var(--color-text-tertiary)">Closed</span>'}
-            </div></td>
-          </tr>`).join('')}
+            <th>Client</th>
+            <th>Service</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Booked on</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${reservations.map(r => {
+            const client  = clientMap[r.clientId]           || null;
+            const slot    = slotMap[r.slotId]               || null;
+            const service = slot ? serviceMap[slot.serviceId] : null;
+
+            const clientName  = client
+              ? escHtml(client.firstName + ' ' + client.lastName)
+              : `<span class="mono">${esc(r.clientId?.substring(0,8))}…</span>`;
+
+            const serviceName = service
+              ? escHtml(service.name)
+              : `<span class="mono">${esc(r.slotId?.substring(0,8))}…</span>`;
+
+            const date = slot?.date     || '—';
+            const time = slot
+              ? escHtml(slot.startTime) + ' – ' + escHtml(slot.endTime)
+              : '—';
+
+            return `
+              <tr>
+                <td>
+                  <div style="font-weight:500">${clientName}</div>
+                  <div style="font-size:11px;color:var(--color-text-tertiary)">${esc(client?.email || '')}</div>
+                </td>
+                <td>${serviceName}</td>
+                <td>${esc(date)}</td>
+                <td>${time}</td>
+                <td><span class="badge badge-${(r.status||'').toLowerCase()}">${esc(r.status)}</span></td>
+                <td>${fmtDateTime(r.createdAt)}</td>
+                <td><div class="actions">
+                  ${r.status === 'PENDING' ? `
+                    <button class="btn btn-success btn-sm" onclick='updateReservation("${r.id}","CONFIRMED")'>Confirm</button>
+                    <button class="btn btn-danger btn-sm"  onclick='updateReservation("${r.id}","CANCELLED")'>Cancel</button>
+                  ` : r.status === 'CONFIRMED' ? `
+                    <button class="btn btn-danger btn-sm"  onclick='updateReservation("${r.id}","CANCELLED")'>Cancel</button>
+                  ` : '<span style="font-size:12px;color:var(--color-text-tertiary)">Closed</span>'}
+                </div></td>
+              </tr>`;
+          }).join('')}
         </tbody>
       </table>`;
+
   } catch(e) {
     $('reservations-table').innerHTML = '<div class="empty" style="color:var(--color-text-danger)"><i class="ti ti-alert-circle"></i>Failed to load</div>';
   }

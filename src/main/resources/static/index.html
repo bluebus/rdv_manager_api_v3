@@ -750,11 +750,24 @@
   async function loadMyBookings() {
     $('bookings-list').innerHTML = '<div class="empty-state"><i class="ti ti-loader"></i>Loading…</div>';
     try {
-      const res = await fetch(`${API}/api/reservations`, { headers: authHeaders() });
-      if (res.status === 401) { doLogout(); return; }
-      if (!res.ok) throw new Error(res.status);
+      // fetch user's reservations, all slots, all services in parallel
+      const [rRes, slotRes, svcRes] = await Promise.all([
+        fetch(`${API}/api/reservations/by-client/${currentUser.id}`, { headers: authHeaders() }),
+        fetch(`${API}/api/slots`, { headers: authHeaders() }),
+        fetch(`${API}/api/services`, { headers: authHeaders() })
+      ]);
 
-      const bookings = await res.json();
+      if (rRes.status === 401) { doLogout(); return; }
+      if (!rRes.ok) throw new Error(rRes.status);
+
+      const bookings  = await rRes.json();
+      const slots     = slotRes.ok  ? await slotRes.json()  : [];
+      const services  = svcRes.ok   ? await svcRes.json()   : [];
+
+      // build lookup maps
+      const slotMap    = Object.fromEntries(slots.map(s => [s.id, s]));
+      const serviceMap = Object.fromEntries(services.map(s => [s.id, s]));
+
       if (!bookings.length) {
         $('bookings-list').innerHTML = `
           <div class="empty-state">
@@ -767,28 +780,45 @@
           </div>`;
         return;
       }
-      $('bookings-list').innerHTML = bookings.map(b => `
-        <div class="booking-card">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
-            <span style="font-size:13px;font-weight:500;color:var(--color-text-secondary)">
-              <i class="ti ti-ticket" style="font-size:14px;vertical-align:-2px;margin-right:4px"></i>
-              Reservation
-            </span>
-            <span class="booking-status status-${b.status}">${b.status}</span>
-          </div>
-          <div class="field-row">
-            <span class="field-label">Reservation ID</span>
-            <span style="font-size:11px;color:var(--color-text-tertiary);font-family:monospace">${b.id}</span>
-          </div>
-          <div class="field-row">
-            <span class="field-label">Slot ID</span>
-            <span style="font-size:11px;color:var(--color-text-tertiary);font-family:monospace">${b.slotId}</span>
-          </div>
-          <div class="field-row">
-            <span class="field-label">Created</span>
-            <span>${fmtLocalDateTime(b.createdAt)}</span>
-          </div>
-        </div>`).join('');
+
+      $('bookings-list').innerHTML = bookings.map(b => {
+        const slot    = slotMap[b.slotId]          || null;
+        const service = slot ? serviceMap[slot.serviceId] : null;
+
+        return `
+          <div class="booking-card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+              <span style="font-size:13px;font-weight:500">
+                <i class="ti ti-ticket" style="font-size:14px;vertical-align:-2px;margin-right:4px"></i>
+                ${escHtml(service?.name || 'Unknown service')}
+              </span>
+              <span class="booking-status status-${b.status}">${b.status}</span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Date</span>
+              <span>${escHtml(slot?.date || '—')}</span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Time</span>
+              <span>${slot ? escHtml(slot.startTime) + ' – ' + escHtml(slot.endTime) : '—'}</span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Spots remaining</span>
+              <span style="color:var(--color-text-${slot?.available > 0 ? 'success' : 'danger'});font-weight:500">
+                ${slot ? slot.available + ' of ' + slot.capacity : '—'}
+              </span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Booked on</span>
+              <span>${fmtLocalDateTime(b.createdAt)}</span>
+            </div>
+            <div class="field-row">
+              <span class="field-label">Reservation ID</span>
+              <span style="font-size:11px;color:var(--color-text-tertiary);font-family:monospace">${b.id}</span>
+            </div>
+          </div>`;
+      }).join('');
+
     } catch (e) {
       $('bookings-list').innerHTML = '<div class="empty-state" style="color:var(--color-text-danger)"><i class="ti ti-alert-circle"></i>Failed to load bookings.</div>';
     }

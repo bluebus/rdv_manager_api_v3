@@ -116,6 +116,19 @@ public class ReservationServiceImpl implements ReservationService {
     @Override
     @Transactional
     public void delete(UUID id) {
+        // 202606 update to verify exists before delete
+        Reservation entity = repository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Reservation not found: " + id));
+
+        // if reservation was CONFIRMED, restore slot availability
+        if (entity.getStatus() == ReservationStatus.CONFIRMED) {
+            Slot slot = slotRepository.findById(entity.getSlotId()).orElse(null);
+            if (slot != null) {
+                slot.setAvailable(Math.min(slot.getAvailable() + 1, slot.getCapacity()));
+                slotRepository.save(slot);
+            }
+        }
+
         repository.deleteById(id);
     }
 }
