@@ -1,5 +1,6 @@
 package com.grey.rdv_manager_api.payload.response;
 
+import com.grey.rdv_manager_api.domain.enums.Role;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,6 +30,6 @@ public record AuthResponse(
 
     // The client's roles as plain strings, e.g. ["ADMIN", "STAFF"]
     // Matches the Role enum values defined in domain/enums/Role.java
-    List<String> roles
+    List<Role> roles
 
 ) {}

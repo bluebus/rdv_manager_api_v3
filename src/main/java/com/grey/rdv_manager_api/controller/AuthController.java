@@ -108,7 +108,7 @@ public class AuthController {
                 token,
                 client.getId(),
                 client.getEmail(),
-                client.getRoles().stream().map(Enum::name).toList()
+                client.getRoles()
         ));
     }
 }
