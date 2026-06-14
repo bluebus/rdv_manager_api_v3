@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.authentication.ProviderManager;
+import org.springframework.http.HttpMethod;
 
 /**
  * Master Spring Security configuration for the application.
@@ -76,7 +77,9 @@ public class SecurityConfig {
                 .requestMatchers("/api/service-availabilities/**").hasAnyRole("ADMIN", "STAFF")
 
                 // ADMIN + STAFF — slot management
+                .requestMatchers(HttpMethod.GET, "/api/slots/**").authenticated()
                 .requestMatchers("/api/slots/**").hasAnyRole("ADMIN", "STAFF")
+
 
                 // Any authenticated user (any role) — reservations and reminders
                 .requestMatchers("/api/reservations/**").authenticated()

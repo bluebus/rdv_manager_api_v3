@@ -11,6 +11,7 @@ import com.grey.rdv_manager_api.payload.request.UpdateReservationRequest;
 import com.grey.rdv_manager_api.payload.response.ReservationResponse;
 import com.grey.rdv_manager_api.repository.ReservationRepository;
 import com.grey.rdv_manager_api.service.ReservationService;
+import com.grey.rdv_manager_api.domain.enums.ReservationStatus;
 
 import java.util.List;
 import java.util.UUID;
@@ -27,6 +28,10 @@ public class ReservationServiceImpl implements ReservationService {
     public ReservationResponse create(CreateReservationRequest request) {
         Reservation entity = mapper.toEntity(request);
         entity.setId(UUID.randomUUID());
+
+        //202606 set initial status for Reservation.status
+        entity.setStatus(ReservationStatus.PENDING);  
+
         Reservation saved = repository.save(entity);
         return mapper.toResponse(saved);
     }

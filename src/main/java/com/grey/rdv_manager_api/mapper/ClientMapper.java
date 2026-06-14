@@ -16,6 +16,16 @@ public interface ClientMapper {
     @Mapping(target = "passwordHash", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    
+    //202606 explicit roles mapping
+    @Mapping(
+    target = "roles",
+    expression = "java(dto.roles().stream()" +
+        ".map(r -> com.grey.rdv_manager_api.domain.enums.Role.valueOf(r.toUpperCase()))" +
+        ".collect(java.util.stream.Collectors.toList()))"
+    )
+    //end new part
+    
     Client toEntity(CreateClientRequest dto);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

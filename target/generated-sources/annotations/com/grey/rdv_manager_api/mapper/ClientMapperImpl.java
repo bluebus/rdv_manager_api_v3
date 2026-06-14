@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2026-06-14T16:15:38+0800",
+    date = "2026-06-14T17:41:46+0800",
     comments = "version: 1.6.3, compiler: javac, environment: Java 17.0.19 (Eclipse Adoptium)"
 )
 @Component
@@ -33,8 +33,9 @@ public class ClientMapperImpl implements ClientMapper {
         client.lastName( dto.lastName() );
         client.email( dto.email() );
         client.phone( dto.phone() );
-        client.roles( stringListToRoleList( dto.roles() ) );
         client.structureId( dto.structureId() );
+
+        client.roles( dto.roles().stream().map(r -> com.grey.rdv_manager_api.domain.enums.Role.valueOf(r.toUpperCase())).collect(java.util.stream.Collectors.toList()) );
 
         return client.build();
     }
@@ -85,7 +86,7 @@ public class ClientMapperImpl implements ClientMapper {
         String lastName = null;
         String email = null;
         String phone = null;
-        List<String> roles = null;
+        List<Role> roles = null;
         UUID structureId = null;
         LocalDateTime createdAt = null;
         LocalDateTime updatedAt = null;
@@ -95,7 +96,10 @@ public class ClientMapperImpl implements ClientMapper {
         lastName = entity.getLastName();
         email = entity.getEmail();
         phone = entity.getPhone();
-        roles = roleListToStringList( entity.getRoles() );
+        List<Role> list = entity.getRoles();
+        if ( list != null ) {
+            roles = new ArrayList<Role>( list );
+        }
         structureId = entity.getStructureId();
         createdAt = entity.getCreatedAt();
         updatedAt = entity.getUpdatedAt();
@@ -119,19 +123,6 @@ public class ClientMapperImpl implements ClientMapper {
         return list;
     }
 
-    protected List<Role> stringListToRoleList(List<String> list) {
-        if ( list == null ) {
-            return null;
-        }
-
-        List<Role> list1 = new ArrayList<Role>( list.size() );
-        for ( String string : list ) {
-            list1.add( Enum.valueOf( Role.class, string ) );
-        }
-
-        return list1;
-    }
-
     protected List<Role> stringSetToRoleList(Set<String> set) {
         if ( set == null ) {
             return null;
@@ -143,18 +134,5 @@ public class ClientMapperImpl implements ClientMapper {
         }
 
         return list;
-    }
-
-    protected List<String> roleListToStringList(List<Role> list) {
-        if ( list == null ) {
-            return null;
-        }
-
-        List<String> list1 = new ArrayList<String>( list.size() );
-        for ( Role role : list ) {
-            list1.add( role.name() );
-        }
-
-        return list1;
     }
 }
