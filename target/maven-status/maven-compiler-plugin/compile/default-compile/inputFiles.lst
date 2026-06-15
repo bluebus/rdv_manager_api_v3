@@ -27,6 +27,7 @@ C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\payload\re
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\payload\response\StructureResponse.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\payload\response\ReminderResponse.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\controller\ServiceAvailabilityController.java
+C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\domain\model\TokenBlacklist.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\domain\model\AuditLog.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\payload\request\CreateReminderRequest.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\payload\request\CreateSlotRequest.java
@@ -38,6 +39,7 @@ C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\payload\re
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\payload\request\UpdateReservationRequest.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\service\impl\ClientServiceImpl.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\payload\request\UpdateServiceRequest.java
+C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\repository\TokenBlacklistRepository.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\repository\ServiceAvailabilityRepository.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\service\impl\StructureServiceImpl.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\repository\ClientRepository.java
@@ -47,6 +49,7 @@ C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\repository
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\controller\ReminderController.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\controller\AuditLogController.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\domain\enums\Weekday.java
+C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\controller\LogoutController.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\payload\request\UpdateClientRequest.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\payload\request\UpdateSlotRequest.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\domain\model\Slot.java

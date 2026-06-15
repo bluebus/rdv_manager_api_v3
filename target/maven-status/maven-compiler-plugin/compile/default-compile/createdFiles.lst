@@ -2,6 +2,7 @@ com\grey\rdv_manager_api\payload\request\CreateServiceAvailabilityRequest.class
 com\grey\rdv_manager_api\repository\StructureRepository.class
 com\grey\rdv_manager_api\security\SecurityConfig.class
 com\grey\rdv_manager_api\service\impl\ReservationServiceImpl.class
+com\grey\rdv_manager_api\domain\model\TokenBlacklist$TokenBlacklistBuilder.class
 com\grey\rdv_manager_api\service\ServiceEntityService.class
 com\grey\rdv_manager_api\payload\request\LoginRequest.class
 com\grey\rdv_manager_api\service\ServiceAvailabilityService.class
@@ -27,6 +28,7 @@ com\grey\rdv_manager_api\controller\AuditLogController.class
 com\grey\rdv_manager_api\domain\model\Structure$StructureBuilder.class
 com\grey\rdv_manager_api\RdvManagerApi.class
 com\grey\rdv_manager_api\payload\request\CreateSlotRequest.class
+com\grey\rdv_manager_api\controller\LogoutController.class
 com\grey\rdv_manager_api\controller\StructureController.class
 com\grey\rdv_manager_api\mapper\ClientMapper.class
 com\grey\rdv_manager_api\service\impl\ServiceAvailabilityServiceImpl.class
@@ -37,6 +39,7 @@ com\grey\rdv_manager_api\mapper\AuditLogMapper.class
 com\grey\rdv_manager_api\repository\ServiceAvailabilityRepository.class
 com\grey\rdv_manager_api\domain\model\AuditLog$AuditLogBuilder.class
 com\grey\rdv_manager_api\service\ReminderService.class
+com\grey\rdv_manager_api\domain\model\TokenBlacklist.class
 com\grey\rdv_manager_api\mapper\StructureMapperImpl.class
 com\grey\rdv_manager_api\payload\response\ClientResponse.class
 com\grey\rdv_manager_api\domain\model\ServiceAvailability$ServiceAvailabilityBuilder.class
@@ -95,6 +98,7 @@ com\grey\rdv_manager_api\controller\ReservationController.class
 com\grey\rdv_manager_api\payload\request\CreateReminderRequest.class
 com\grey\rdv_manager_api\payload\response\StructureResponse.class
 com\grey\rdv_manager_api\security\ClientUserDetailsService.class
+com\grey\rdv_manager_api\repository\TokenBlacklistRepository.class
 com\grey\rdv_manager_api\service\SlotService.class
 com\grey\rdv_manager_api\controller\ClientController.class
 com\grey\rdv_manager_api\mapper\ReminderMapperImpl.class

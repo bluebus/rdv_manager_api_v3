@@ -4,6 +4,8 @@ import io.jsonwebtoken.Claims;
 import jakarta.servlet.*;
 import jakarta.servlet.http.*;
 import lombok.RequiredArgsConstructor;
+import com.grey.rdv_manager_api.repository.TokenBlacklistRepository;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +35,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     // JwtTokenProvider handles all token parsing logic
     private final JwtTokenProvider jwtTokenProvider;
+    //private final UserDetailsService userDetailsService;
+
+    // Add TokenBlacklistRepository as a constructor field
+    // @RequiredArgsConstructor will inject it automatically.
+    private final TokenBlacklistRepository tokenBlacklistRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -53,6 +60,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             // If invalid, we skip straight to chain.doFilter() below,
             // leaving the SecurityContext empty → request will be rejected.
             if (jwtTokenProvider.validateToken(token)) {
+
+                // STEP 3B — Check if this token was revoked ──────────────
+                // Even if the token is cryptographically valid, the user may have
+                // logged out. Revoked tokens are stored in the token_blacklist
+                // collection in MongoDB. If found, reject immediately with 401.
+                if (tokenBlacklistRepository.existsByToken(token)) {
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    response.setContentType("application/json");
+                    response.getWriter().write(
+                        "{\"error\": \"Token has been revoked. Please log in again.\"}"
+                    );
+                    return; // stop here — do NOT continue the filter chain
+                }
 
                 // STEP 4 — Extract the claims payload from the verified token
                 Claims claims = jwtTokenProvider.getClaims(token);

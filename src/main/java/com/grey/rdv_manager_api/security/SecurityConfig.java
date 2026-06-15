@@ -100,8 +100,9 @@ public class SecurityConfig {
                     "/swagger-resources"
                 ).permitAll()
 
-                // ── PUBLIC API ──────────────────────────────────────────
-                .requestMatchers("/api/auth/**").permitAll()
+                // ── PUBLIC API Allow register and login without a token (public endpoints) ──────────────────────────────────────────
+                .requestMatchers(HttpMethod.POST, "/api/auth/register").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
 
                 // ── CLIENT-accessible GETs ──────────────────────────────
                 .requestMatchers(HttpMethod.GET, "/api/services/**").authenticated()

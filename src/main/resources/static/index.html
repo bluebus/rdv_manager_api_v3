@@ -606,7 +606,23 @@
   }
 
   // ─── LOGOUT ───────────────────────────────────────────────────
-  function doLogout() {
+  async function doLogout() {
+
+    // Step 1: Revoke the token on the server before clearing anything locally.
+    const token = sessionStorage.getItem('rdv_token');
+    if (token) {
+        try {
+            await fetch('/api/auth/logout', {
+                method: 'POST',
+                headers: { 'Authorization': 'Bearer ' + token }
+            });
+        } catch (e) {
+            // Server unreachable — still proceed with local logout below.
+            console.warn('Logout request failed, clearing session anyway.', e);
+        }
+    }
+
+    // Step 2: Cleanup session data and cache
     token = null; currentUser = null;
     selectedService = null; selectedSlot = null; selectedStructure = null;
     sessionStorage.removeItem('rdv_token');

@@ -41,7 +41,7 @@ public class JwtTokenProvider {
     }
 
     /**
-     * STEP — Login success path.
+     * Login success path.
      * Called by AuthController once credentials are verified.
      * Builds a signed JWT containing:
      *   - subject  : the client's email (used as the username)
@@ -63,7 +63,7 @@ public class JwtTokenProvider {
     }
 
     /**
-     * STEP — Protected request path.
+     * Protected request path.
      * Parses and verifies the token signature.
      * Returns the Claims object (payload) if valid.
      * Throws JwtException if the token is expired, malformed, or tampered with.
@@ -100,5 +100,18 @@ public class JwtTokenProvider {
             // not thrown, so the filter chain continues unauthenticated.
             return false;
         }
+    }
+
+    /**
+     * Extracts the expiry date from a JWT token.
+     *
+     * Used by LogoutController to store the correct expiresAt value
+     * in the blacklist, so MongoDB knows when to auto-delete the entry.
+     *
+     * @param token the raw JWT string
+     * @return the expiry Date parsed from the token's claims
+     */
+    public Date getExpiration(String token) {
+        return getClaims(token).getExpiration();
     }
 }
