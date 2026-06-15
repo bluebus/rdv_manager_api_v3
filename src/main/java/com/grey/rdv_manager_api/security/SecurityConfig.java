@@ -82,6 +82,8 @@ public class SecurityConfig {
                     "/webjars/**"
                 ).permitAll()
 
+                .requestMatchers("/swagger-resources/**").permitAll()
+
                 // ── PUBLIC STATIC PAGES ────────────────────────────────────
                 //.requestMatchers("/", "/index.html", "/admin.html").permitAll()
                 //.requestMatchers("/static/**", "/css/**", "/js/**", "/*.ico").permitAll()

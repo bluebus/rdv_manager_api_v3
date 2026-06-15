@@ -38,6 +38,7 @@ public class RdvManagerApi {
         //202606 New config insert here for modern browsers
         config.setAllowCredentials(true);
         config.setAllowedOrigins(List.of(
+            "http://localhost:8080",   // Swagger UI self-requests
             "http://localhost:3000",   // local frontend dev
             "http://localhost:4200",   // Angular default
             "https://yourdomain.com"   // production — replace this
@@ -46,6 +47,8 @@ public class RdvManagerApi {
         config.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
         // 202606 explicit headers instead of wildcard
         config.setAllowedHeaders(List.of("Authorization","Content-Type","Accept"));
+        //202606 add Swagger UI part
+        config.setExposedHeaders(List.of("Authorization")); 
         //end new part
         
         source.registerCorsConfiguration("/**", config);

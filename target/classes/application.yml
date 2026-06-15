@@ -7,7 +7,11 @@ springdoc:
     tags-sorter: alpha
     try-it-out-enabled: true      # enables the Try it out button by default
   api-docs:
-    path: /v3/api-docs #end new part
+    path: /v3/api-docs 
+  show-actuator: false
+  pre-loading-enabled: true          # loads spec at startup, not on first request
+  packages-to-scan: com.grey.rdv_manager_api   # explicit scan path  
+  #end new part
 spring:
   data:
     mongodb:
