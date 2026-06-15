@@ -13,6 +13,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.http.HttpMethod;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.List;
 
 /**
  * Master Spring Security configuration for the application.
@@ -54,48 +59,55 @@ public class SecurityConfig {
             // Disable CSRF — safe for stateless REST APIs that don't use browser cookies
             .csrf(csrf -> csrf.disable())
 
+            // ── CORS now lives inside the security chain ────────────────
+            // This runs AFTER permitAll() is evaluated, not before it.
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
             // Never create or use an HttpSession — each request is self-contained
             .sessionManagement(sm ->
                 sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
+            // ── Configure 401 for unauthenticated requests ──────────────
+            // Spring Security 6 defaults to 403 when no entryPoint is set.
+            // This makes the response semantically correct.
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((request, response, authException) ->
+                    response.sendError(
+                        jakarta.servlet.http.HttpServletResponse.SC_UNAUTHORIZED,
+                        "Unauthorized"
+                    )
+                )
+            )
+
             .authorizeHttpRequests(auth -> auth
 
-                // ── STATIC FRONTEND PAGES ─────────────────────────────────
+                // ── STATIC FRONTEND PAGES ───────────────────────────────
                 .requestMatchers(
-                    "/",
-                    "/index.html",
-                    "/admin.html",
-                    "/static/**",
-                    "/css/**",
-                    "/js/**",
-                    "/*.ico"
+                    "/", "/index.html", "/admin.html",
+                    "/static/**", "/css/**", "/js/**", "/*.ico"
                 ).permitAll()
 
-                // ── SWAGGER / OPENAPI — must be before any role rules ──────
+                // ── SWAGGER / OPENAPI ───────────────────────────────────
                 .requestMatchers(
                     "/swagger-ui.html",
                     "/swagger-ui/**",
-                    "/swagger-ui/index.html",
                     "/v3/api-docs",
+                    "/v3/api-docs/",
                     "/v3/api-docs/**",
                     "/v3/api-docs.yaml",
-                    "/webjars/**"
+                    "/webjars/**",
+                    "/swagger-resources/**",
+                    "/swagger-resources"
                 ).permitAll()
 
-                .requestMatchers("/swagger-resources/**").permitAll()
-
-                // ── PUBLIC STATIC PAGES ────────────────────────────────────
-                //.requestMatchers("/", "/index.html", "/admin.html").permitAll()
-                //.requestMatchers("/static/**", "/css/**", "/js/**", "/*.ico").permitAll()
-                
-                // ── PUBLIC API ─────────────────────────────────────────────
+                // ── PUBLIC API ──────────────────────────────────────────
                 .requestMatchers("/api/auth/**").permitAll()
 
-                // ── CLIENT-accessible GETs (must be before ADMIN-only rules)
+                // ── CLIENT-accessible GETs ──────────────────────────────
                 .requestMatchers(HttpMethod.GET, "/api/services/**").authenticated()
                 .requestMatchers(HttpMethod.GET, "/api/slots/**").authenticated()
 
-                // ── ADMIN only ─────────────────────────────────────────────
+                // ── ADMIN only ──────────────────────────────────────────
                 .requestMatchers("/api/audit-logs/**").hasRole("ADMIN")
                 .requestMatchers("/api/clients/**").hasRole("ADMIN")
                 .requestMatchers("/api/structures/**").hasRole("ADMIN")
@@ -103,7 +115,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/service-availabilities/**").hasRole("ADMIN")
                 .requestMatchers("/api/slots/**").hasRole("ADMIN")
 
-                // ── ANY AUTHENTICATED (CLIENT + ADMIN) ─────────────────────
+                // ── ANY AUTHENTICATED ───────────────────────────────────
                 .requestMatchers("/api/reservations/**").authenticated()
                 .requestMatchers("/api/reminders/**").authenticated()
 
@@ -116,6 +128,26 @@ public class SecurityConfig {
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    // ── CORS configuration as a bean ────────────────────────────────────────
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowCredentials(true);
+        config.setAllowedOrigins(List.of(
+            "http://localhost:8080",
+            "http://localhost:3000",
+            "http://localhost:4200",
+            "https://yourdomain.com"
+        ));
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+        config.setExposedHeaders(List.of("Authorization"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", config);
+        return source;
     }
 
     /**

@@ -29,12 +29,17 @@ spring:
       max-request-size: 10MB
   application:
     name: rdv_manager_api_1.0
+#line before here is origin config
+#202606 update logging setting
 logging:
   level:
     root: INFO
+    org.springframework.security: TRACE
+    org.springframework.security.web.FilterChainProxy: DEBUG
+    org.springframework.security.web.access: DEBUG
     org.springframework.web: DEBUG
     com.grey.sytsas: DEBUG
-#line before here is origin config
+
 
 app: # 202606 added for JWT config
   jwt:
