@@ -1,5 +1,10 @@
 package com.grey.rdv_manager_api.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,12 +19,18 @@ import com.grey.rdv_manager_api.service.ServiceEntityService;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Services", description = "Services offered by a structure. Write operations are ADMIN only.")
+@SecurityRequirement(name = "bearerAuth")
+
 @RestController
 @RequestMapping("/api/services")
 @RequiredArgsConstructor
 public class ServiceController {
 
     private final ServiceEntityService serviceService;
+
+    @Operation(summary = "Create a service", description = "ADMIN only")
+    @ApiResponse(responseCode = "201", description = "Service created")
 
     @PostMapping
     public ResponseEntity<ServiceResponse> createService(
@@ -28,18 +39,25 @@ public class ServiceController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
+    @Operation(summary = "Get service by ID")
+    
     @GetMapping("/{id}")
     public ResponseEntity<ServiceResponse> getService(@PathVariable UUID id) {
         ServiceResponse response = serviceService.getById(id);
         return ResponseEntity.ok(response);
     }
 
+    @Operation(
+        summary = "List all services",
+        description = "Each service includes structureName embedded from the linked structure."
+    )
     @GetMapping
     public ResponseEntity<List<ServiceResponse>> getAllServices() {
         List<ServiceResponse> list = serviceService.getAll();
         return ResponseEntity.ok(list);
     }
 
+    @Operation(summary = "Update a service", description = "ADMIN only")
     @PutMapping("/{id}")
     public ResponseEntity<ServiceResponse> updateService(
             @PathVariable UUID id,
@@ -48,6 +66,8 @@ public class ServiceController {
         return ResponseEntity.ok(response);
     }
 
+    @Operation(summary = "Delete a service", description = "ADMIN only")
+    @ApiResponse(responseCode = "204", description = "Deleted")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteService(@PathVariable UUID id) {

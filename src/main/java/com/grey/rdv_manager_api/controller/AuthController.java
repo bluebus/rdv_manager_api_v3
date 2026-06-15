@@ -1,5 +1,7 @@
 package com.grey.rdv_manager_api.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -26,6 +28,7 @@ import java.util.stream.Collectors;
  *   POST /api/auth/register  → create a new Client account
  *   POST /api/auth/login     → verify credentials and return a JWT
  */
+@Tag(name = "Authentication", description = "Register and login — no token required")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
@@ -55,6 +58,12 @@ public class AuthController {
      * Returns 200 OK with the created client details (no token issued here —
      * the user must call /login separately after registering).
      */
+    @Operation(
+        summary = "Register a new client account",
+        description = "Creates a CLIENT account. Assign ADMIN role manually in MongoDB after.",
+        security = {}   // no padlock — this endpoint is public
+    )
+    
     @PostMapping("/register")
     public ResponseEntity<ClientResponse> register(
             @Validated @RequestBody CreateClientRequest request) {
@@ -76,6 +85,12 @@ public class AuthController {
      * The returned token must be included in subsequent requests as:
      *   Authorization: Bearer <token>
      */
+
+    @Operation(
+        summary = "Login and receive JWT token",
+        description = "Returns a Bearer token. Copy the token value, click Authorize at the top of this page, and paste it there (without the word Bearer).",
+        security = {}   // no padlock — this endpoint is public
+    )
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(
             @Validated @RequestBody LoginRequest request) {

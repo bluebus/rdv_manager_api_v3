@@ -43,6 +43,7 @@ com\grey\rdv_manager_api\domain\model\ServiceAvailability$ServiceAvailabilityBui
 com\grey\rdv_manager_api\mapper\ServiceAvailabilityMapper.class
 com\grey\rdv_manager_api\payload\response\ReservationResponse.class
 com\grey\rdv_manager_api\repository\SlotRepository.class
+com\grey\rdv_manager_api\config\OpenApiConfig.class
 com\grey\rdv_manager_api\payload\request\UpdateServiceAvailabilityRequest.class
 com\grey\rdv_manager_api\domain\enums\Role.class
 com\grey\rdv_manager_api\repository\ReservationRepository.class

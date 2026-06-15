@@ -79,5 +79,6 @@ C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\payload\re
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\mapper\SlotMapper.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\payload\response\AuditLogResponse.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\repository\SlotRepository.java
+C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\config\OpenApiConfig.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\service\ClientService.java
 C:\Users\WY\rdv_manager_api_v3\src\main\java\com\grey\rdv_manager_api\security\JwtTokenProvider.java

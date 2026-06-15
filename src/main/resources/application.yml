@@ -3,6 +3,11 @@ server:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+    operations-sorter: alpha      # 202606 update to sorts endpoints A→Z
+    tags-sorter: alpha
+    try-it-out-enabled: true      # enables the Try it out button by default
+  api-docs:
+    path: /v3/api-docs #end new part
 spring:
   data:
     mongodb:

@@ -60,10 +60,32 @@ public class SecurityConfig {
 
             .authorizeHttpRequests(auth -> auth
 
-                // ── PUBLIC STATIC PAGES ────────────────────────────────────
-                .requestMatchers("/", "/index.html", "/admin.html").permitAll()
-                .requestMatchers("/static/**", "/css/**", "/js/**", "/*.ico").permitAll()
+                // ── STATIC FRONTEND PAGES ─────────────────────────────────
+                .requestMatchers(
+                    "/",
+                    "/index.html",
+                    "/admin.html",
+                    "/static/**",
+                    "/css/**",
+                    "/js/**",
+                    "/*.ico"
+                ).permitAll()
 
+                // ── SWAGGER / OPENAPI — must be before any role rules ──────
+                .requestMatchers(
+                    "/swagger-ui.html",
+                    "/swagger-ui/**",
+                    "/swagger-ui/index.html",
+                    "/v3/api-docs",
+                    "/v3/api-docs/**",
+                    "/v3/api-docs.yaml",
+                    "/webjars/**"
+                ).permitAll()
+
+                // ── PUBLIC STATIC PAGES ────────────────────────────────────
+                //.requestMatchers("/", "/index.html", "/admin.html").permitAll()
+                //.requestMatchers("/static/**", "/css/**", "/js/**", "/*.ico").permitAll()
+                
                 // ── PUBLIC API ─────────────────────────────────────────────
                 .requestMatchers("/api/auth/**").permitAll()
 
