@@ -446,22 +446,23 @@ function showLoginMsg(type, text) {
   $('login-msg').innerHTML = `<div class="alert alert-${type}" style="margin-bottom:12px">${text}</div>`;
 }
 
-function doLogout() {
-  // Step 1: Revoke the token on the server before clearing anything locally.
-    const token = sessionStorage.getItem('rdv_token');
-    if (token) {
-        try {
-            await fetch('/api/auth/logout', {
-                method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + token }
-            });
-        } catch (e) {
-            // Server unreachable — still proceed with local logout below.
-            console.warn('Logout request failed, clearing session anyway.', e);
-        }
-    }
+async function doLogout() {
+  // Step 1: Revoke the token on the server.
+  // Sends the current Bearer token to POST /api/auth/logout so the backend
+  const savedToken = sessionStorage.getItem('rdv_token');
+  if (savedToken) {
+      try {
+          await fetch('/api/auth/logout', {
+              method: 'POST',
+              headers: { 'Authorization': 'Bearer ' + savedToken }
+          });
+      } catch (e) {
+          // Server unreachable — still clear local session below.
+          console.warn('Logout request failed, clearing session anyway.', e);
+      }
+  }
 
-  // Step 2: Cleanup session data and cache
+  // Step 2: Clear all local state and return to login screen.
   token = null; currentAdmin = null;
   sessionStorage.removeItem('rdv_token');
   sessionStorage.removeItem('rdv_user');
@@ -858,30 +859,64 @@ async function updateReservation(id, status) {
 async function loadAuditLogs() {
   $('auditlogs-table').innerHTML = '<div class="empty"><i class="ti ti-loader"></i>Loading…</div>';
   try {
-    const res = await fetch(`${API}/api/audit-logs`, { headers: authHeaders() });
-    if (!res.ok) throw new Error(res.status);
-    const data = await res.json();
-    if (!data.length) {
+    // Fetch audit logs, clients, and all entity collections in parallel.
+    // Clients resolve performedBy → name + role.
+    // Other collections resolve entityId → human-readable name for the row.
+    const [logsRes, clientsRes, reservationsRes, slotsRes, servicesRes, structuresRes] = await Promise.all([
+      fetch(`${API}/api/audit-logs`,   { headers: authHeaders() }),
+      fetch(`${API}/api/clients`,      { headers: authHeaders() }),
+      fetch(`${API}/api/reservations`, { headers: authHeaders() }),
+      fetch(`${API}/api/slots`,        { headers: authHeaders() }),
+      fetch(`${API}/api/services`,     { headers: authHeaders() }),
+      fetch(`${API}/api/structures`,   { headers: authHeaders() })
+    ]);
+
+    if (!logsRes.ok) throw new Error(logsRes.status);
+
+    const logs        = await logsRes.json();
+    const clients     = clientsRes.ok      ? await clientsRes.json()      : [];
+    const reservations= reservationsRes.ok ? await reservationsRes.json() : [];
+    const slots       = slotsRes.ok        ? await slotsRes.json()        : [];
+    const services    = servicesRes.ok     ? await servicesRes.json()     : [];
+    const structures  = structuresRes.ok   ? await structuresRes.json()   : [];
+
+    // Lookup maps — keyed by id and by email for clients
+    const clientById    = buildMap(clients);
+    const clientByEmail = Object.fromEntries(clients.map(c => [c.email, c]));
+    const reservationMap= buildMap(reservations);
+    const slotMap       = buildMap(slots);
+    const serviceMap    = buildMap(services);
+    const structureMap  = buildMap(structures);
+
+    if (!logs.length) {
       $('auditlogs-table').innerHTML = '<div class="empty"><i class="ti ti-history"></i>No audit logs yet</div>';
       return;
     }
-    $('auditlogs-table').innerHTML = `
-      <table>
-        <thead><tr><th>Entity</th><th>Entity ID</th><th>Action</th><th>Performed by</th><th>Timestamp</th></tr></thead>
-        <tbody>${data.slice().reverse().map(l => `
-          <tr>
-            <td style="font-weight:500">${esc(l.entityName)}</td>
-            <td class="mono">${esc((l.entityId || '').substring(0, 8))}…</td>
-            <td>${esc(l.action)}</td>
-            <td>${esc(l.performedBy || '—')}</td>
-            <td>${fmtDateTime(l.timestamp)}</td>
-          </tr>`).join('')}
-        </tbody>
-      </table>`;
-  } catch(e) {
-    $('auditlogs-table').innerHTML = '<div class="empty" style="color:var(--color-text-danger)"><i class="ti ti-alert-circle"></i>Failed to load</div>';
-  }
-}
+
+    const rows = logs.slice().reverse().map(l => {
+
+      // ── ACTION badge ────────────────────────────────────────────────────────
+      // Colour-code by action type so it's scannable at a glance
+      const actionStyle = {
+        CREATE: 'background:var(--color-background-success);color:var(--color-text-success)',
+        UPDATE: 'background:var(--color-background-info);color:var(--color-text-info)',
+        DELETE: 'background:var(--color-background-danger);color:var(--color-text-danger)'
+      }[l.action] || 'background:var(--color-background-secondary);color:var(--color-text-secondary)';
+
+      const actionHtml = `
+        <span style="${actionStyle};padding:2px 10px;border-radius:4px;font-size:11px;font-weight:500">
+          ${esc(l.action)}
+        </span>`;
+
+      // ── ENTITY column ────────────────────────────────────────────────────────
+      // Show entity name + resolve entityId to a human-readable description
+      // based on what type of entity it is
+      let entityDetailHtml = '';
+      if (l.entityName === 'Reservation') {
+        const res     = lookupId(reservationMap, l.entityId);
+        const slot    = res ? lookupId(slotMap,     res.slotId)    : null;
+        const service = slot ? lookupId(serviceMap, slot.serviceId) : null;
+        if (service) {
 
 // ─── DELETE ───────────────────────────────────────────────────────────────────
 async function deleteItem(endpoint, id, label) {
@@ -1073,7 +1108,15 @@ window.openModal = async function(type, data) {
         const sel  = $('f-serviceId');
         if (sel) {
           sel.innerHTML = '<option value="">— select service —</option>' +
-            svcs.map(s => `<option value="${s.id}">${esc(s.name)}</option>`).join('');
+            svcs.map(s => {
+              // structureName is embedded in ServiceResponse from the backend.
+              // Show "Service Name — Structure Name" so the admin can tell
+              // which structure each service belongs to at a glance.
+              const label = s.structureName
+                ? `${s.name} — ${s.structureName}`
+                : s.name;
+              return `<option value="${s.id}">${esc(label)}</option>`;
+            }).join('');
         }
       }
     } catch(e) {}

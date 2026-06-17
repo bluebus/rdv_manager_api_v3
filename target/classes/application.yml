@@ -44,5 +44,5 @@ logging:
 app: # 202606 added for JWT config
   jwt:
     secret: 9d4deec43e5c4d7fd35edc20010d8f506e178721fb5aaac19e98de66fabcb423   # min 32 chars
-    expiration-ms: 86400000   # 24 hours
+    expiration-ms: 36000000 # token valid for 10 hours
   
