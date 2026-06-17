@@ -143,7 +143,7 @@
     @keyframes spin { to { transform: rotate(360deg); } }
     .empty { text-align: center; padding: 2rem; color: var(--color-text-tertiary); font-size: 13px; }
     .empty i { font-size: 28px; display: block; margin-bottom: 6px; }
-    .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.5rem; }
+    .stat-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 1.5rem; }
     .stat-card { background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; }
     .stat-label { font-size: 12px; color: var(--color-text-secondary); margin-bottom: 4px; }
     .stat-value { font-size: 24px; font-weight: 500; }
@@ -222,6 +222,7 @@
         <div class="stat-grid">
           <div class="stat-card"><div class="stat-label">Structures</div><div class="stat-value" id="stat-structures">—</div></div>
           <div class="stat-card"><div class="stat-label">Services</div><div class="stat-value" id="stat-services">—</div></div>
+          <div class="stat-card"><div class="stat-label">Admins</div><div class="stat-value" id="stat-admins">—</div></div>
           <div class="stat-card"><div class="stat-label">Clients</div><div class="stat-value" id="stat-clients">—</div></div>
           <div class="stat-card"><div class="stat-label">Reservations</div><div class="stat-value" id="stat-reservations">—</div></div>
         </div>
@@ -575,7 +576,13 @@ async function loadDashboard() {
 
     if (sRes.ok)   { const d = await sRes.json();   $('stat-structures').textContent = d.length; }
     if (svcRes.ok) { const d = await svcRes.json(); $('stat-services').textContent   = d.length; }
-    if (cRes.ok)   { const d = await cRes.json();   $('stat-clients').textContent    = d.length; }
+    if (cRes.ok)   {
+      const d = await cRes.json();
+      const adminCount  = d.filter(c => Array.isArray(c.roles) && c.roles.includes('ADMIN')).length;
+      const clientCount = d.filter(c => Array.isArray(c.roles) && c.roles.includes('CLIENT') && !c.roles.includes('ADMIN')).length;
+      $('stat-admins').textContent  = adminCount;
+      $('stat-clients').textContent = clientCount;
+    }
 
     if (!rRes.ok) { $('dash-reservations').innerHTML = '<div class="empty"><i class="ti ti-alert-circle"></i>Failed to load</div>'; return; }
 
@@ -859,9 +866,6 @@ async function updateReservation(id, status) {
 async function loadAuditLogs() {
   $('auditlogs-table').innerHTML = '<div class="empty"><i class="ti ti-loader"></i>Loading…</div>';
   try {
-    // Fetch audit logs, clients, and all entity collections in parallel.
-    // Clients resolve performedBy → name + role.
-    // Other collections resolve entityId → human-readable name for the row.
     const [logsRes, clientsRes, reservationsRes, slotsRes, servicesRes, structuresRes] = await Promise.all([
       fetch(`${API}/api/audit-logs`,   { headers: authHeaders() }),
       fetch(`${API}/api/clients`,      { headers: authHeaders() }),
@@ -873,50 +877,136 @@ async function loadAuditLogs() {
 
     if (!logsRes.ok) throw new Error(logsRes.status);
 
-    const logs        = await logsRes.json();
-    const clients     = clientsRes.ok      ? await clientsRes.json()      : [];
-    const reservations= reservationsRes.ok ? await reservationsRes.json() : [];
-    const slots       = slotsRes.ok        ? await slotsRes.json()        : [];
-    const services    = servicesRes.ok     ? await servicesRes.json()     : [];
-    const structures  = structuresRes.ok   ? await structuresRes.json()   : [];
+    const logs         = await logsRes.json();
+    const clients      = clientsRes.ok      ? await clientsRes.json()      : [];
+    const reservations = reservationsRes.ok ? await reservationsRes.json() : [];
+    const slots        = slotsRes.ok        ? await slotsRes.json()        : [];
+    const services     = servicesRes.ok     ? await servicesRes.json()     : [];
+    const structures   = structuresRes.ok   ? await structuresRes.json()   : [];
 
-    // Lookup maps — keyed by id and by email for clients
-    const clientById    = buildMap(clients);
-    const clientByEmail = Object.fromEntries(clients.map(c => [c.email, c]));
-    const reservationMap= buildMap(reservations);
-    const slotMap       = buildMap(slots);
-    const serviceMap    = buildMap(services);
-    const structureMap  = buildMap(structures);
+    const clientById     = buildMap(clients);
+    const clientByEmail  = Object.fromEntries(clients.map(c => [c.email, c]));
+    const reservationMap = buildMap(reservations);
+    const slotMap        = buildMap(slots);
+    const serviceMap     = buildMap(services);
+    const structureMap   = buildMap(structures);
 
     if (!logs.length) {
       $('auditlogs-table').innerHTML = '<div class="empty"><i class="ti ti-history"></i>No audit logs yet</div>';
       return;
     }
 
-    const rows = logs.slice().reverse().map(l => {
+    // ── resolve entity into [line1, line2, line3]
+    // line1 = entity type, line2 = service name (reservation) or email (client), line3 = structure name
+    function resolveEntity(l) {
+      let line1 = l.entityName || '—';
+      let line2 = '';
+      let line3 = '';
 
-      // ── ACTION badge ────────────────────────────────────────────────────────
-      // Colour-code by action type so it's scannable at a glance
-      const actionStyle = {
-        CREATE: 'background:var(--color-background-success);color:var(--color-text-success)',
-        UPDATE: 'background:var(--color-background-info);color:var(--color-text-info)',
-        DELETE: 'background:var(--color-background-danger);color:var(--color-text-danger)'
-      }[l.action] || 'background:var(--color-background-secondary);color:var(--color-text-secondary)';
-
-      const actionHtml = `
-        <span style="${actionStyle};padding:2px 10px;border-radius:4px;font-size:11px;font-weight:500">
-          ${esc(l.action)}
-        </span>`;
-
-      // ── ENTITY column ────────────────────────────────────────────────────────
-      // Show entity name + resolve entityId to a human-readable description
-      // based on what type of entity it is
-      let entityDetailHtml = '';
       if (l.entityName === 'Reservation') {
-        const res     = lookupId(reservationMap, l.entityId);
-        const slot    = res ? lookupId(slotMap,     res.slotId)    : null;
-        const service = slot ? lookupId(serviceMap, slot.serviceId) : null;
-        if (service) {
+        const res       = lookupId(reservationMap, l.entityId);
+        const slot      = res     ? lookupId(slotMap,       res.slotId)        : null;
+        const service   = slot    ? lookupId(serviceMap,    slot.serviceId)    : null;
+        const structure = service ? lookupId(structureMap,  service.structureId) : null;
+        if (service)   line2 = service.name;
+        if (structure) line3 = structure.name;
+      } else if (l.entityName === 'Client') {
+        const client = lookupId(clientById, l.entityId);
+        if (client) line2 = client.email;
+      }
+
+      return [line1, line2, line3];
+    }
+
+    // ── resolve performedBy into [displayName, role, email]
+    // tries email lookup first, then UUID lookup, then falls back to raw value
+    function resolvePerformer(performedBy) {
+      const byEmail  = clientByEmail[performedBy];
+      const byId     = !byEmail ? lookupId(clientById, performedBy) : null;
+      const resolved = byEmail || byId;
+
+      if (resolved) {
+        const roles = Array.isArray(resolved.roles) ? resolved.roles : [];
+        const role  = roles[0] ? String(roles[0]) : 'CLIENT';
+        return [
+          `${esc(resolved.firstName)} ${esc(resolved.lastName)}`,
+          role,
+          resolved.email
+        ];
+      }
+      if (performedBy === 'ADMIN') return ['ADMIN', 'ADMIN', ''];
+      // fallback: unknown value shown as-is (e.g. raw UUID not found in clients)
+      return [esc(String(performedBy || '—')), '', ''];
+    }
+
+    // ── action badge colour map
+    const actionStyle = {
+      CREATE: 'background:var(--color-background-success);color:var(--color-text-success)',
+      UPDATE: 'background:var(--color-background-info);color:var(--color-text-info)',
+      DELETE: 'background:var(--color-background-danger);color:var(--color-text-danger)'
+    };
+
+    // ── role badge html
+    function roleBadge(role) {
+      const isAdmin = role === 'ADMIN';
+      const bg    = isAdmin ? 'var(--color-background-danger)'  : 'var(--color-background-secondary)';
+      const color = isAdmin ? 'var(--color-text-danger)'        : 'var(--color-text-secondary)';
+      return `<span style="background:${bg};color:${color};padding:1px 7px;border-radius:4px;font-size:11px;font-weight:500">${esc(role)}</span>`;
+    }
+
+    const rows = logs.slice().reverse().map(l => {
+      const [eLine1, eLine2, eLine3] = resolveEntity(l);
+      const [pName,  pRole,  pEmail] = resolvePerformer(l.performedBy);
+
+      // show full entity UUID — no truncation
+      const entityId = esc(String(l.entityId || '—'));
+
+      const aStyle = actionStyle[l.action] || 'background:var(--color-background-secondary);color:var(--color-text-secondary)';
+      const ts     = fmtDateTime(l.timestamp);
+
+      // Each log entry renders as 3 visual sub-rows.
+      // Entity ID, Action, and Timestamp use rowspan=3 so they appear once per entry.
+      // The border separating entries is drawn only on sub-row 3 (bottom of each group).
+      // Sub-rows 1 and 2 have border-bottom:none to avoid unwanted lines inside the group.
+      return `
+        <tr>
+          <td style="font-weight:500;border-bottom:none;padding-bottom:2px">${esc(eLine1)}</td>
+          <td class="mono" rowspan="3" style="vertical-align:top;padding-top:8px;font-size:12px;border-bottom:1px solid var(--color-border-tertiary)">${entityId}</td>
+          <td style="font-weight:500;border-bottom:none;padding-bottom:2px">${pName}</td>
+          <td rowspan="3" style="vertical-align:middle;text-align:left;border-bottom:1px solid var(--color-border-tertiary)">
+            <span style="${aStyle};padding:2px 10px;border-radius:4px;font-size:11px;font-weight:500">${esc(l.action)}</span>
+          </td>
+          <td rowspan="3" style="vertical-align:middle;white-space:nowrap;border-bottom:1px solid var(--color-border-tertiary)">${ts}</td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:var(--color-text-secondary);border-bottom:none;padding-top:0;padding-bottom:2px">${esc(eLine2)}</td>
+          <td style="font-size:12px;border-bottom:none;padding-top:0;padding-bottom:2px">${pRole ? roleBadge(pRole) : ''}</td>
+        </tr>
+        <tr>
+          <td style="font-size:12px;color:var(--color-text-tertiary);padding-top:0;border-bottom:1px solid var(--color-border-tertiary)">${esc(eLine3)}</td>
+          <td style="font-size:12px;color:var(--color-text-tertiary);padding-top:0;border-bottom:1px solid var(--color-border-tertiary)">${esc(pEmail)}</td>
+        </tr>`;
+    }).join('');
+
+    $('auditlogs-table').innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>Entity</th>
+            <th>Entity ID</th>
+            <th>Performed by</th>
+            <th>Action</th>
+            <th>Timestamp</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>`;
+
+  } catch(e) {
+    console.error('loadAuditLogs error:', e);
+    $('auditlogs-table').innerHTML = '<div class="empty" style="color:var(--color-text-danger)"><i class="ti ti-alert-circle"></i>Failed to load</div>';
+  }
+}
 
 // ─── DELETE ───────────────────────────────────────────────────────────────────
 async function deleteItem(endpoint, id, label) {

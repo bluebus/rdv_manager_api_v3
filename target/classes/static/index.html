@@ -579,6 +579,16 @@
       });
       if (res.ok) {
         const data  = await res.json();
+
+        // index.html is the CLIENT portal only.
+        // ADMIN accounts must use admin.html instead.
+        const roles = Array.isArray(data.roles) ? data.roles : [];
+        if (roles.includes('ADMIN')) {
+            $('login-msg').innerHTML =
+                '<span style="color:var(--color-text-danger)">Admin accounts must log in via <a href="/admin.html">admin.html</a>.</span>';
+            return;
+        }
+
         token       = data.token;
         currentUser = data;
         sessionStorage.setItem('rdv_token', data.token);
