@@ -33,7 +33,7 @@ public record AuthResponse(
     @Schema(description = "Email address", example = "admin@rdv.com")
     String email,
 
-    // The client's roles as plain strings, e.g. ["ADMIN", "STAFF"]
+    // The client's roles as plain strings, e.g. ["ADMIN"] or ["CLIENT"]
     // Matches the Role enum values defined in domain/enums/Role.java
     @Schema(description = "Roles assigned to this account")
     List<Role> roles

@@ -447,7 +447,7 @@ pm.collectionVariables.set("client_id", response.id);
 - Set Token to `{{jwt_token}}`
 - Click **Save**
 
-Every request in the collection now inherits this token automatically. You only need to re-run the login request when the token expires (24 hours).
+Every request in the collection now inherits this token automatically. You only need to re-run the login request when the token expires (10 hours).
 
 ### Environment Variables
 
@@ -486,9 +486,9 @@ Run these requests in order to seed the system and test the full booking flow:
            body: { "status": "CANCELLED" }           → slot.available should restore
 13. GET    {{base_url}}/api/slots/{{slot_id}}        → verify available restored
 14. DELETE {{base_url}}/api/reservations/{{reservation_id}}
+                                                     → expect 204 No Content
 15. POST   {{base_url}}/api/auth/logout             → 200 OK, token blacklisted
 16. GET    {{base_url}}/api/clients                 → 401 Unauthorized (token revoked)
-                                                     → expect 204 No Content
 ```
 
 ### Sample Request Bodies

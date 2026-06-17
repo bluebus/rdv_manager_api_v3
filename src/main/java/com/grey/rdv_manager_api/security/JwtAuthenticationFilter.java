@@ -81,7 +81,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String email = claims.getSubject();
 
                 // STEP 6 — Extract roles from the "roles" claim.
-                // The value is a comma-separated string: e.g. "ADMIN,STAFF"
+                // The value is a comma-separated string: e.g. "ADMIN" or "CLIENT" or "ADMIN,CLIENT"
                 // Each role is prefixed with "ROLE_" because Spring Security's
                 // hasRole("ADMIN") internally checks for "ROLE_ADMIN".
                 // FIX P2: previously hardcoded as "USER" — now reads real roles from token.

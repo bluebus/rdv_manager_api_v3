@@ -43,6 +43,6 @@ public record CreateClientRequest(
         @NotEmpty(message = "At least one role is required")
         List<Role> roles,
 
-        // Optional — only required for ADMIN and STAFF accounts
+        // Optional — only required for ADMIN accounts
         UUID structureId
         ){}
