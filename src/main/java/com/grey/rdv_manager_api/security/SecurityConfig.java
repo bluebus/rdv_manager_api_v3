@@ -46,7 +46,7 @@ public class SecurityConfig {
      * FILTER CHAIN — defines the security rules for every HTTP request.
      *
      * Processing order for an incoming request:
-     *   1. CORS preflight handled by RdvManagerApi.simpleCorsFilter() (already fixed)
+     *   1. CORS preflight handled by corsConfigurationSource() bean inside this filter chain
      *   2. CSRF disabled — not needed for stateless JWT APIs
      *   3. Session policy = STATELESS — Spring will never create an HttpSession;
      *      every request must carry its own JWT

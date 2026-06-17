@@ -24,11 +24,12 @@ import java.util.stream.Collectors;
  * Public authentication endpoints — both routes are permitted without a token
  * (configured in SecurityConfig: .requestMatchers("/api/auth/**").permitAll()).
  *
- * TWO endpoints:
+ * THREE endpoints:
  *   POST /api/auth/register  → create a new Client account
  *   POST /api/auth/login     → verify credentials and return a JWT
+ *   POST /api/auth/logout    → revoke the current JWT (handled by LogoutController)
  */
-@Tag(name = "Authentication", description = "Register and login — no token required")
+@Tag(name = "Authentication", description = "Register and login are public — logout requires a Bearer token")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor

@@ -37,7 +37,7 @@ import java.util.Map;
  * After logout, JwtAuthenticationFilter checks the blacklist on every request
  * and rejects the old token with 401 even if it hasn't expired yet.
  */
-@Tag(name = "Authentication", description = "Register and login — no token required")
+@Tag(name = "Authentication", description = "Register and login are public — logout requires a Bearer token")
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor

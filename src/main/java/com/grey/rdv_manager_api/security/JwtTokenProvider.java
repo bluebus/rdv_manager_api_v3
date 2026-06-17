@@ -2,12 +2,11 @@ package com.grey.rdv_manager_api.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
-
-import javax.crypto.SecretKey;
 import java.util.Base64;
 import java.util.Date;
+import javax.crypto.SecretKey;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 /**
  * Central JWT utility — responsible for THREE things only:
@@ -31,7 +30,7 @@ public class JwtTokenProvider {
     /**
      * Constructor injection reads both values from application.yml:
      *   app.jwt.secret          → base64-encoded HMAC-SHA256 key (min 32 chars decoded)
-     *   app.jwt.expiration-ms   → token lifetime in milliseconds (e.g. 86400000 = 24h)
+     *   app.jwt.expiration-ms   → token lifetime in milliseconds (e.g. 36000000 = 10h)
      */
     public JwtTokenProvider(
             @Value("${app.jwt.secret}") String secret,

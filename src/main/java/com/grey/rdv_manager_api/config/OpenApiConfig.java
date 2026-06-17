@@ -21,9 +21,9 @@ public class OpenApiConfig {
                 .title("RDV Manager API")
                 .version("3.0")
                 .description(
-                    "Appointment booking REST API. " +
-                    "Login via POST /api/auth/login, " +
-                    "copy the token, click Authorize, paste it (without the Bearer prefix)."
+                    "Appointment booking REST API — appointment booking for clinics and service organisations. " +
+                    "Login via POST /api/auth/login, copy the token, click Authorize, paste it (without the Bearer prefix). " +
+                    "To logout and revoke the token, call POST /api/auth/logout with the Bearer token in the Authorization header."
                 )
                 .contact(new Contact()
                     .name("RDV Manager")

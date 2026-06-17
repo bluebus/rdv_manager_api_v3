@@ -31,7 +31,7 @@ public class Client {
     private String passwordHash;
 
     private List<Role> roles;
-    private UUID structureId; // Only for ADMIN and STAFF; null for CLIENT role
+    private UUID structureId; // Only for ADMIN accounts; null for CLIENT role
 
     @CreatedDate
     private LocalDateTime createdAt;
