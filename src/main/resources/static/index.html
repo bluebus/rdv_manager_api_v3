@@ -584,8 +584,8 @@
         // ADMIN accounts must use admin.html instead.
         const roles = Array.isArray(data.roles) ? data.roles : [];
         if (roles.includes('ADMIN')) {
-            $('login-msg').innerHTML =
-                '<span style="color:var(--color-text-danger)">Admin accounts must log in via <a href="/admin.html">admin.html</a>.</span>';
+            setLoading('login-spinner', 'login-btn', false); 
+            showMsg('auth-msg', 'error', 'Admin accounts must log in via <a href="/admin.html" style="color:inherit;font-weight:500">admin.html</a>.');
             return;
         }
 
@@ -619,15 +619,14 @@
   async function doLogout() {
 
     // Step 1: Revoke the token on the server before clearing anything locally.
-    const token = sessionStorage.getItem('rdv_token');
-    if (token) {
+    const savedToken = sessionStorage.getItem('rdv_token');
+   if (savedToken) {
         try {
             await fetch('/api/auth/logout', {
                 method: 'POST',
-                headers: { 'Authorization': 'Bearer ' + token }
+                headers: { 'Authorization': 'Bearer ' + savedToken }
             });
         } catch (e) {
-            // Server unreachable — still proceed with local logout below.
             console.warn('Logout request failed, clearing session anyway.', e);
         }
     }
