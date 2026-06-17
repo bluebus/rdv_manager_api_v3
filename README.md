@@ -59,6 +59,7 @@ src/main/resources/
 | `reminders` | `Reminder` | Notification reminders for reservations |
 | `service_availability` | `ServiceAvailability` | Weekly availability schedule per service |
 | `audit_logs` | `AuditLog` | System audit trail for reservation actions |
+| `token_blacklist` | `TokenBlacklist` | Revoked JWT tokens — auto-purged via MongoDB TTL index |
 
 ---
 
@@ -73,12 +74,14 @@ src/main/resources/
 
 ## Security
 
-- JWT tokens issued on login, valid for 24 hours
+- JWT tokens issued on login, valid for **10 hours** (`expiration-ms: 36000000`)
 - Tokens stored in `sessionStorage` on the frontend (cleared on tab close)
 - BCrypt password hashing on registration
 - `JwtAuthenticationFilter` validates every request before Spring Security rules apply
 - Role-based access enforced in `SecurityConfig`
 - CORS configured inside Spring Security's filter chain (not as a separate `FilterRegistrationBean`)
+- On logout, the token is saved to `token_blacklist` in MongoDB and immediately rejected on all subsequent requests
+- MongoDB TTL index on `token_blacklist.expiresAt` auto-deletes entries when the token's own expiry passes — no manual cleanup needed
 
 ### Endpoint Access Rules
 
@@ -86,6 +89,7 @@ src/main/resources/
 |---|---|
 | `POST /api/auth/register` | Public |
 | `POST /api/auth/login` | Public |
+| `POST /api/auth/logout` | Any authenticated user (token required to revoke) |
 | `GET /api/services/**` | Any authenticated user |
 | `GET /api/slots/**` | Any authenticated user |
 | `GET /api/reservations/by-client/{id}` | Any authenticated user |
@@ -108,6 +112,7 @@ src/main/resources/
 |---|---|---|
 | POST | `/api/auth/register` | Register a new client account |
 | POST | `/api/auth/login` | Login and receive JWT token |
+| POST | `/api/auth/logout` | Revoke current JWT token (requires Bearer token) |
 
 ### Structures
 | Method | Endpoint | Description |
@@ -252,7 +257,7 @@ spring:
 app:
   jwt:
     secret: <base64-encoded-secret-min-32-bytes>
-    expiration-ms: 86400000   # 24 hours
+    expiration-ms: 36000000   # 10 hours
 ```
 
 ---
@@ -367,13 +372,23 @@ The project uses **springdoc-openapi 2.7.0** to auto-generate interactive API do
 6. Paste the token into the `bearerAuth` field and click **Authorize**
 7. All subsequent requests in the UI will include the `Authorization: Bearer …` header automatically
 
+### Testing Token Revocation via Swagger UI
+
+1. Login and authorize as above (steps 1–6)
+2. Expand **Authentication** → `POST /api/auth/logout` → click **Try it out**
+3. Click **Execute** — expect `200 OK` with `{"message": "Logged out successfully"}`
+4. Try any protected endpoint (e.g. `GET /api/clients`) — expect `401 Unauthorized`
+5. Verify in MongoDB: `db.token_blacklist.find().pretty()` — one document should appear with an `ISODate` `expiresAt` field
+
+**Note:** The token is still present in the Swagger Authorize dialog after logout. Swagger has no way to know it was revoked server-side — the 401 on step 4 is the confirmation.
+
 ### Endpoint Visibility
 
 | Behaviour | Reason |
 |---|---|
-| `POST /api/auth/login` and `POST /api/auth/register` show no padlock | `security = {}` set on those operations — they are public |
-| All other endpoints show a closed padlock 🔒 | `@SecurityRequirement(name = "bearerAuth")` set at controller level |
-| Endpoints grouped by tag | `@Tag(name = "…")` annotation on each controller |
+| `POST /api/auth/login` and `POST /api/auth/register` show no padlock | `security = {}` explicitly set on those two operations overrides the global bearer scheme |
+| `POST /api/auth/logout` shows a closed padlock 🔒 | Requires a valid Bearer token — intentional, token must be present to revoke it |
+| All other endpoints show a closed padlock 🔒 | Global `addSecurityItem(bearerAuth)` in `OpenApiConfig` applies to everything not explicitly overridden |
 
 ### CORS Note for Swagger UI
 
@@ -471,6 +486,8 @@ Run these requests in order to seed the system and test the full booking flow:
            body: { "status": "CANCELLED" }           → slot.available should restore
 13. GET    {{base_url}}/api/slots/{{slot_id}}        → verify available restored
 14. DELETE {{base_url}}/api/reservations/{{reservation_id}}
+15. POST   {{base_url}}/api/auth/logout             → 200 OK, token blacklisted
+16. GET    {{base_url}}/api/clients                 → 401 Unauthorized (token revoked)
                                                      → expect 204 No Content
 ```
 
@@ -551,11 +568,12 @@ Run these requests in order to seed the system and test the full booking flow:
 - Browse available services — shows service name, description, and linked structure
 - Select a service → view available time slots → confirm booking
 - View own reservations with status badge, location, date, time, and booked-on timestamp
+- ADMIN accounts are blocked at login with a redirect link to admin.html
 
 ### `http://localhost:8080/admin.html` — Admin Portal
 
 - Login as ADMIN only (CLIENT accounts are blocked at login)
-- **Dashboard** — live counts for structures, services, clients, reservations + recent reservations table with inline confirm/cancel actions
+- **Dashboard** — live counts for structures, services, admins, clients, and reservations separately + recent reservations table
 - **Structures** — full CRUD (name, description, address, phone, email)
 - **Services** — full CRUD, shows linked structure name
 - **Slots** — full CRUD, shows service and structure, available count colour-coded
@@ -583,6 +601,5 @@ Each entry records: entity name, entity ID, action, performer, timestamp, and a 
 ## Known Limitations
 
 - No email/SMS reminder dispatch — reminders are stored but not sent
-- No token revocation — logout is client-side only; JWT remains valid until 24 h expiry
 - No pagination — all list endpoints return full collections
 - Audit logging covers reservations and client registration; structure/service/slot/client update changes are not logged
